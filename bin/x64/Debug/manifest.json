@@ -1,0 +1,19 @@
+{
+  "name": "Blishpad",
+  "version": "0.1.0",
+  "namespace": "Snaid1.Blishpad",
+  "package": "BlishHudNotepad.dll",
+  "manifest_version": 1,
+
+  "description": "A small module for taking and keeping notes",
+  "dependencies": {
+    "bh.blishhud": ">=0.11.4"
+  },
+  "url": "https://github.com/Snaid1/BHUD-Blishpad",
+  "author": {
+    "name": "Snaid1",
+    "url": "https://github.com/Snaid1"
+  },
+  "directories": [ "notes" ],
+  "enabled_without_gw2": false
+}

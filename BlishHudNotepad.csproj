@@ -130,6 +130,7 @@
   <ItemGroup>
     <Compile Include="FileHelper.cs" />
     <Compile Include="Module.cs" />
+    <Compile Include="ref\PostItWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="AsyncClipboardService, Version=1.7.1.0, Culture=neutral, processorArchitecture=MSIL">

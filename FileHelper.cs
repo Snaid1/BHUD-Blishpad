@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Snaid1.BlishHudNotepad
 {
-    class FileHelper
+    public class FileHelper
     {
         internal DirectoriesManager DirectoriesManager;
 

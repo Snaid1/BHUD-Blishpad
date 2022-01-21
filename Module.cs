@@ -1,5 +1,6 @@
 ﻿using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Overlay.UI.Views;
@@ -32,7 +33,7 @@ namespace Snaid1.BlishHudNotepad
         public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; }
 
 
-        private PostItWindow PostIt = new PostItWindow();
+        private static PostItWindow PostIt = new PostItWindow();
         //Settings
 
 
@@ -83,11 +84,12 @@ namespace Snaid1.BlishHudNotepad
 
         protected override async Task LoadAsync()
         {
+            PostIt.LoadAsync();
         }
 
         protected override void OnModuleLoaded(EventArgs e)
         {
-
+            PostIt.OnModuleLoaded();
             // Base handler must be called
             base.OnModuleLoaded(e);
         }
@@ -103,7 +105,7 @@ namespace Snaid1.BlishHudNotepad
             // Unload
             _notesIcon?.Dispose();
 
-            _notesWindow?.Dispose();
+            //_notesWindow?.Dispose();
             PostIt?.Unload();
 
 
@@ -113,37 +115,16 @@ namespace Snaid1.BlishHudNotepad
             ModuleInstance = null;
         }
 
-        
-
-        /*private void updatePostitSize()
+        public static PostItWindow getPostIt()
         {
-            Rectangle windowbounds = _postItWindow.AbsoluteBounds;
-            ResizeTexture(ContentsManager.GetTexture(@"textures\1909316.png"), windowbounds);
+            return PostIt;
         }
 
-        /*private Texture2D ResizeTexture(Texture2D oldTexture, Rectangle newbounds)
+        public override IView GetSettingsView()
         {
-            return ResizeTexture(oldTexture, newbounds.Width, newbounds.Height);
+            BlishHudNotepad.Views.SettingsView settingview = new BlishHudNotepad.Views.SettingsView();
+            return settingview;
         }
-        private Texture2D ResizeTexture(Texture2D oldTexture, int newwidth, int newheight)
-        {
-            var newTexture = oldTexture;
-            var newRectangle = new Rectangle(0, 0, newwidth, newheight);
-
-            SpriteBatch batch = new SpriteBatch(Blish_HUD.GameService.Graphics.GraphicsDevice);
-            if(_postItWindow != null)
-            {
-                batch.Begin();
-                batch?.DrawOnCtrl(_postItWindow, oldTexture, _postItWindow.ContentRegion, oldTexture.Bounds, Color.White);
-                batch.End();
-                
-
-
-            }
-
-            return newTexture;
-        }*/
-
 
     }
 

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Snaid1.BlishHudNotepad
+namespace Snaid1.Blishpad
 {
     public class FileHelper
     {

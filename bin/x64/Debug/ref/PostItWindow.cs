@@ -8,6 +8,7 @@ using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Snaid1.BlishHudNotepad
+namespace Snaid1.Blishpad
 {
     public class PostItWindow
     {
@@ -41,10 +42,13 @@ namespace Snaid1.BlishHudNotepad
         internal SettingEntry<bool> _settingPostItAlwaysOnTop;
         internal SettingEntry<PostItSize> _settingPostItSize;
         internal SettingEntry<string> _settingPostItFontSize;
+        internal SettingEntry<bool> _settingEscClosesPostIt;
+        internal SettingEntry<bool> _settingPreservePostItContents;
 
         private StandardWindow _postItWindow { get; set; }
-
+        private MultilineTextBox _postItTextBox;
         private Panel _postItSettingsPanel;
+        
 
 
         private string PostItText;
@@ -65,20 +69,24 @@ namespace Snaid1.BlishHudNotepad
             _settingPostItOpacityFocused = settings.DefineSetting("PostItOpacityFocused", 100.0f, () => "Post-It Opacity (focused)", () => "Percentage of how Opaque/Transparent the Post It Notes window should be when focused");
             _settingPostItAlwaysOnTop = settings.DefineSetting("PostItAlwaysOnTop", false, () => "Post-It Always On Top", () => "When Checked will cause the Post-It window to be on top of any other windows");
             _settingPostItFontSize = settings.DefineSetting("PostItFontSize", "16", () => "Post-It Window Font Size", () => "the font size for the Post-It window");
+            _settingEscClosesPostIt = settings.DefineSetting("PostItEscClosesIt", false, () => "Close Post-It with Esc", () => "Allows Post-It window to be closed by pressing Esc or clicking the close 'x'");
+            _settingPreservePostItContents = settings.DefineSetting("PostItPreserveContents", true, () => "Preserve Post-It Contents", () => "Causes the Post-It window to remember it's content's between runs.");
 
             _settingShowPostItWindow.SettingChanged += UpdatePostItSettings;
             _settingPostItOpacity.SettingChanged += UpdatePostItSettings;
             _settingPostItOpacityFocused.SettingChanged += UpdatePostItSettings;
-            _settingPostItAlwaysOnTop.SettingChanged += UpdatePostItSettings;
+            _settingPostItAlwaysOnTop.SettingChanged += UpdateAlwaysOnTop;
             _settingPostItSize.SettingChanged += UpdatePostItSettings;
             _settingPostItFontSize.SettingChanged += UpdatePostItSettings;
+            _settingEscClosesPostIt.SettingChanged += UpdatePostItClosable;
         }
 
         public void Initialize()
         {
 
             PostItFile = "_PostIt";
-            PostItText = FileManager.ReadFile(PostItFile);
+            PostItText = "";
+            if (_settingPreservePostItContents.Value) { PostItText = FileManager.ReadFile(PostItFile); }
 
         }
 
@@ -89,7 +97,6 @@ namespace Snaid1.BlishHudNotepad
 
         public void OnModuleLoaded()
         {
-
             CreatePostIt();
         }
         public void Unload()
@@ -98,10 +105,14 @@ namespace Snaid1.BlishHudNotepad
             _settingShowPostItWindow.SettingChanged -= UpdatePostItSettings;
             _settingPostItOpacity.SettingChanged -= UpdatePostItSettings;
             _settingPostItOpacityFocused.SettingChanged -= UpdatePostItSettings;
-            _settingPostItAlwaysOnTop.SettingChanged -= UpdatePostItSettings;
+            _settingPostItAlwaysOnTop.SettingChanged -= UpdateAlwaysOnTop;
             _settingPostItSize.SettingChanged -= UpdatePostItSettings;
+            _settingPostItFontSize.SettingChanged -= UpdatePostItSettings;
+            _settingEscClosesPostIt.SettingChanged -= UpdatePostItClosable;
 
-            _postItWindow.Dispose();
+            _postItTextBox?.Dispose();
+            _postItWindow?.Dispose();
+            _postItSettingsPanel?.Dispose();
         }
         private void UpdatePostItSettings(object sender = null, ValueChangedEventArgs<PostItSize> e = null)
         {
@@ -109,7 +120,9 @@ namespace Snaid1.BlishHudNotepad
         }
         private void UpdatePostItSettings(object sender = null, ValueChangedEventArgs<String> e = null)
         {
-            CreatePostIt();
+            if(_postItWindow != null){
+                _postItTextBox.Font = getFont(_settingPostItFontSize.Value);
+            }
 
         }
         private void UpdatePostItSettings(object sender = null, ValueChangedEventArgs<float> e = null)
@@ -126,6 +139,20 @@ namespace Snaid1.BlishHudNotepad
             else
             {
                 _postItWindow?.Dispose();
+            }
+        }
+        private void UpdateAlwaysOnTop(object sender = null, ValueChangedEventArgs<bool> e = null)
+        {
+            if (_postItWindow != null)
+            {
+                _postItWindow.TopMost = _settingPostItAlwaysOnTop.Value;
+            }
+        }
+        private void UpdatePostItClosable(object sender = null, ValueChangedEventArgs<bool> e = null)
+        {
+            if (_postItWindow != null)
+            {
+                _postItWindow.CanClose = _settingEscClosesPostIt.Value;
             }
         }
 
@@ -175,11 +202,11 @@ namespace Snaid1.BlishHudNotepad
                 TopMost = _settingPostItAlwaysOnTop.Value,
                 Opacity = _settingPostItOpacity.Value / 100,
                 CanResize = false,
-                CanClose = false,
+                CanClose = _settingEscClosesPostIt.Value,
                 HeightSizingMode = SizingMode.Standard,
                 WidthSizingMode = SizingMode.Standard
             };
-            var postItTextBox = new MultilineTextBox()
+            _postItTextBox = new MultilineTextBox()
             {
                 Parent = _postItWindow,
                 PlaceholderText = "Enter notes here ...",
@@ -190,25 +217,28 @@ namespace Snaid1.BlishHudNotepad
 
             };
 
-            _postItWindow.MouseEntered += delegate { mouseOn = true; assignPostItOpacity(mouseOn, postItTextBox.Focused); };
+            _postItWindow.MouseEntered += delegate { mouseOn = true; assignPostItOpacity(mouseOn, _postItTextBox.Focused); };
             _postItWindow.MouseLeft += delegate {
                 mouseOn = false;
-                assignPostItOpacity(mouseOn, postItTextBox.Focused);
+                assignPostItOpacity(mouseOn, _postItTextBox.Focused);
             };
-            //_postItWindow.Resized += delegate { updatePostitSize(); };
 
-            postItTextBox.InputFocusChanged += delegate
+            _postItTextBox.InputFocusChanged += delegate
             {
-                assignPostItOpacity(mouseOn, postItTextBox.Focused);
-                if (postItTextBox.Focused == false)
+                assignPostItOpacity(mouseOn, _postItTextBox.Focused);
+                if (_postItTextBox.Focused == false && _settingPreservePostItContents.Value)
                 {
-                    FileManager.WriteFile(PostItFile, postItTextBox.Text);
+                    FileManager.WriteFile(PostItFile, _postItTextBox.Text);
                 }
             };
+            
 
 
-            _postItWindow.Show();
-            assignPostItOpacity(mouseOn, postItTextBox.Focused);
+            if (_settingShowPostItWindow.Value)
+            {
+                _postItWindow.Show();
+            }
+            assignPostItOpacity(mouseOn, _postItTextBox.Focused);
         }
 
         private void assignPostItOpacity(Boolean mouseOn, Boolean focused)
@@ -287,7 +317,7 @@ namespace Snaid1.BlishHudNotepad
                 HeightSizingMode = SizingMode.AutoSize,
                 Title = "Post-It Settings"
             };
-
+            //checkboxes
             IView settingShowPostItWindow_View = SettingView.FromType(_settingShowPostItWindow, postItPanel.Width);
             ViewContainer settingShowPostItWindow_Container = new ViewContainer()
             {
@@ -306,11 +336,30 @@ namespace Snaid1.BlishHudNotepad
             };
             settingPostItAlwaysOnTop_Container.Show(settingPostItAlwaysOnTop_View);
 
+            IView settingEscClosesPostIt_View = SettingView.FromType(_settingEscClosesPostIt, postItPanel.Width);
+            ViewContainer settingEscClosesPostIt_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(340, 10),
+                Parent = postItPanel
+            };
+            settingEscClosesPostIt_Container.Show(settingEscClosesPostIt_View);
+
+            IView settingPreservePostItContents_View = SettingView.FromType(_settingPreservePostItContents, postItPanel.Width);
+            ViewContainer settingPreservePostItContents_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, settingShowPostItWindow_Container.Bottom + 10),
+                Parent = postItPanel
+            };
+            settingPreservePostItContents_Container.Show(settingPreservePostItContents_View);
+            
+            //Drop Down Lists
             IView settingPostItSize_View = SettingView.FromType(_settingPostItSize, postItPanel.Width);
             ViewContainer settingPostItSize_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
-                Location = new Point(10, settingPostItAlwaysOnTop_Container.Bottom + 10),
+                Location = new Point(10, settingPreservePostItContents_Container.Bottom + 10),
                 Parent = postItPanel
             };
             settingPostItSize_Container.Show(settingPostItSize_View);
@@ -341,7 +390,7 @@ namespace Snaid1.BlishHudNotepad
             };
             
 
-
+            //Sliders
             IView settingPostItOpacity_View = SettingView.FromType(_settingPostItOpacity, postItPanel.Width);
             ViewContainer settingPostItOpacity_Container = new ViewContainer()
             {

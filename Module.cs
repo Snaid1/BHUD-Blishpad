@@ -11,7 +11,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
-namespace Snaid1.BlishHudNotepad
+namespace Snaid1.Blishpad
 {
     [Export(typeof(Blish_HUD.Modules.Module))]
     public class NotesModule : Blish_HUD.Modules.Module
@@ -122,7 +122,7 @@ namespace Snaid1.BlishHudNotepad
 
         public override IView GetSettingsView()
         {
-            BlishHudNotepad.Views.SettingsView settingview = new BlishHudNotepad.Views.SettingsView();
+            Blishpad.Views.SettingsView settingview = new Blishpad.Views.SettingsView();
             return settingview;
         }
 

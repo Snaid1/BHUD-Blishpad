@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Blish_HUD.Settings.UI.Views;
 using Blish_HUD.Graphics.UI;
 
-namespace Snaid1.BlishHudNotepad.Views
+namespace Snaid1.Blishpad.Views
 {
     class SettingsView : View
     {
@@ -17,7 +17,12 @@ namespace Snaid1.BlishHudNotepad.Views
                 Width = buildPanel.Width
             };
 
-            NotesModule.getPostIt().getPostItSettingPanel(parentPanel);
+            var PostItPanel = NotesModule.getPostIt().getPostItSettingPanel(parentPanel);
+            if(buildPanel is Panel)
+            {
+                PostItPanel.ShowBorder = false;
+                PostItPanel.Title = "";
+            }
         }
     }
 }

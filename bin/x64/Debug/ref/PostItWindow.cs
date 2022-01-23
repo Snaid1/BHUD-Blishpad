@@ -1,6 +1,7 @@
 ﻿using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Overlay.UI.Views;
@@ -44,6 +45,7 @@ namespace Snaid1.Blishpad
         internal SettingEntry<string> _settingPostItFontSize;
         internal SettingEntry<bool> _settingEscClosesPostIt;
         internal SettingEntry<bool> _settingPreservePostItContents;
+        internal SettingEntry<KeyBinding> _settingPostItToggleKey;
 
         private StandardWindow _postItWindow { get; set; }
         private MultilineTextBox _postItTextBox;
@@ -71,6 +73,7 @@ namespace Snaid1.Blishpad
             _settingPostItFontSize = settings.DefineSetting("PostItFontSize", "16", () => "Post-It Window Font Size", () => "the font size for the Post-It window");
             _settingEscClosesPostIt = settings.DefineSetting("PostItEscClosesIt", false, () => "Close Post-It with Esc", () => "Allows Post-It window to be closed by pressing Esc or clicking the close 'x'");
             _settingPreservePostItContents = settings.DefineSetting("PostItPreserveContents", true, () => "Preserve Post-It Contents", () => "Causes the Post-It window to remember it's content's between runs.");
+            _settingPostItToggleKey = settings.DefineSetting("PostItToggleHotkey", new KeyBinding(ModifierKeys.Ctrl, Keys.P) { Enabled = true, BlockSequenceFromGw2 = true }, () => "Toggle Post-It Hotkey", () => "Hotkey used to toggle the Post-It pad on or off");
 
             _settingShowPostItWindow.SettingChanged += UpdatePostItSettings;
             _settingPostItOpacity.SettingChanged += UpdatePostItSettings;
@@ -98,6 +101,7 @@ namespace Snaid1.Blishpad
         public void OnModuleLoaded()
         {
             CreatePostIt();
+            SetPostItHotkey();
         }
         public void Unload()
         {
@@ -409,6 +413,17 @@ namespace Snaid1.Blishpad
             };
             settingPostItOpacityFocused_Container.Show(settingPostItOpacityFocused_View);
 
+            //Hotkey
+            IView settingPostItToggleKey_View = SettingView.FromType(_settingPostItToggleKey, postItPanel.Width);
+            ViewContainer settingPostItToggleKey_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(15, settingPostItOpacityFocused_Container.Bottom + 10),
+                Parent = postItPanel
+            };
+            settingPostItToggleKey_Container.Show(settingPostItToggleKey_View);
+
+
             _postItSettingsPanel = postItPanel;
             return postItPanel;
             /*
@@ -420,6 +435,24 @@ namespace Snaid1.Blishpad
             _postItSettingsPanel.Parent = parentpanel;
             _postItSettingsPanel.Width = parentpanel.Width;
             return _postItSettingsPanel;
+        }
+
+        public void SetPostItHotkey()
+        {
+            /*KeyBinding PostItToggleHotkey = new KeyBinding(ModifierKeys.Shift, Keys.P)
+            {
+                Enabled = true,
+                BlockSequenceFromGw2 = true
+            };*/
+            _settingPostItToggleKey.Value.Activated += PostItToggleHotkey_Activated;
+        }
+
+        private void PostItToggleHotkey_Activated(object sender, EventArgs e)
+        {
+            if(_postItWindow != null)
+            {
+                _postItWindow.ToggleWindow();
+            }
         }
     }
 }

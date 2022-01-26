@@ -130,7 +130,7 @@
   <ItemGroup>
     <Compile Include="FileHelper.cs" />
     <Compile Include="Module.cs" />
-    <Compile Include="ref\PostItWindow.cs" />
+    <Compile Include="PostItWindow.cs" />
     <Compile Include="Views\SettingsView.cs" />
   </ItemGroup>
   <ItemGroup>

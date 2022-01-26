@@ -7,6 +7,7 @@ using Blish_HUD.Overlay.UI.Views;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Snaid1.Blishpad.Controls;
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
@@ -30,20 +31,22 @@ namespace Snaid1.Blishpad
         internal FileHelper FileManager;
 
         [ImportingConstructor]
-        public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; }
+        public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; notesManager = new NotesManager(this); }
 
 
         private static PostItWindow PostIt = new PostItWindow();
+        internal NotesManager notesManager;
         //Settings
 
 
 
-        //private TabbedWindow2 _notesWindow;
+        private TabbedWindow2 _notesWindow;
         private CornerIcon _notesIcon;
 
         protected override void DefineSettings(SettingCollection settings)
         {
-            PostIt?.DefineSettings(settings);
+            PostIt.DefineSettings(settings);
+            notesManager.DefineSettings(settings);
         }
 
         protected override void Initialize()
@@ -52,18 +55,12 @@ namespace Snaid1.Blishpad
             PostIt.SetManagers(SettingsManager, ContentsManager, DirectoriesManager, Gw2ApiManager, FileManager);
             PostIt.Initialize();
 
-            /*_notesWindow = new TabbedWindow2(Blish_HUD.GameService.Content.GetTexture("controls/window/502049"), new Rectangle(0, 0, 545, 630), new Rectangle(82, 30, 467, 600))
-            {
-                Parent = Blish_HUD.GameService.Graphics.SpriteScreen,
-                Title = "TabbedWindow",
-                Emblem = Blish_HUD.GameService.Content.GetTexture("controls/window/156022"),
-                Subtitle = "Example Subtitle",
-                SavesPosition = true,
-                //Id = $"{nameof(ExampleClass)}_ExampleModule_38d37290-b5f9-447d-97ea-45b0b50e5f56"
-            };
+            notesManager.Initialize();
 
-            _notesWindow.Tabs.Add(new Tab(Blish_HUD.GameService.Content.GetTexture("155052"), () => new OverlaySettingsView(), "Settings"));
-            _notesWindow.Tabs.Add(new Tab(Blish_HUD.GameService.Content.GetTexture("155052"), () => new AboutView(), "About Blish HUD"));*/
+            _notesWindow = notesManager.getWindow();
+
+            //_notesWindow.Tabs.Add(new Tab(Blish_HUD.GameService.Content.GetTexture("155052"), () => new Blishpad.Views.SettingsView(), "Settings"));
+            //_notesWindow.Tabs.Add(new Tab(Blish_HUD.GameService.Content.GetTexture("155052"), () => new AboutView(), "About Blish HUD"));*/
 
             //_notesWindow.Show();
 
@@ -79,17 +76,19 @@ namespace Snaid1.Blishpad
                 Priority = 5
             };
 
-            _notesIcon.Click += delegate { PostIt.ToggleWindow(); };
+            _notesIcon.Click += delegate { _notesWindow.ToggleWindow(); };
         }
 
         protected override async Task LoadAsync()
         {
             PostIt.LoadAsync();
+            notesManager.LoadAsync();
         }
 
         protected override void OnModuleLoaded(EventArgs e)
         {
             PostIt.OnModuleLoaded();
+            notesManager.OnModuleLoaded();
             // Base handler must be called
             base.OnModuleLoaded(e);
         }
@@ -107,6 +106,7 @@ namespace Snaid1.Blishpad
 
             //_notesWindow?.Dispose();
             PostIt?.Unload();
+            notesManager?.Unload();
 
 
 
@@ -122,8 +122,13 @@ namespace Snaid1.Blishpad
 
         public override IView GetSettingsView()
         {
-            Blishpad.Views.SettingsView settingview = new Blishpad.Views.SettingsView();
+            Blishpad.Views.SettingsView settingview = new Blishpad.Views.SettingsView(this);
             return settingview;
+        }
+
+        public Panel GetNotesManagerSettingView(Container parnetPanel)
+        {
+            return notesManager.getSettingsPanel(parnetPanel);
         }
 
     }

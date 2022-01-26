@@ -1,20 +1,25 @@
 ﻿using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Graphics.UI;
+using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Overlay.UI.Views;
 using Blish_HUD.Settings;
+using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.BitmapFonts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Snaid1.BlishHudNotepad
+namespace Snaid1.Blishpad
 {
-    class PostItWindow
+    public class PostItWindow
     {
         internal SettingsManager SettingsManager;
         internal ContentsManager ContentsManager;
@@ -30,15 +35,22 @@ namespace Snaid1.BlishHudNotepad
             Large,
             XLarge
         }
-
+        internal static String[] _fontSizes = new string[] { "12", "14", "16", "18", "32" };
+        //Settings
         internal SettingEntry<bool> _settingShowPostItWindow;
         internal SettingEntry<float> _settingPostItOpacity;
         internal SettingEntry<float> _settingPostItOpacityFocused;
         internal SettingEntry<bool> _settingPostItAlwaysOnTop;
         internal SettingEntry<PostItSize> _settingPostItSize;
-        internal SettingEntry<String> _settingPostItContents;
+        internal SettingEntry<string> _settingPostItFontSize;
+        internal SettingEntry<bool> _settingEscClosesPostIt;
+        internal SettingEntry<bool> _settingPreservePostItContents;
+        internal SettingEntry<KeyBinding> _settingPostItToggleKey;
 
         private StandardWindow _postItWindow { get; set; }
+        private MultilineTextBox _postItTextBox;
+        private Panel _postItSettingsPanel;
+        
 
 
         private string PostItText;
@@ -58,39 +70,64 @@ namespace Snaid1.BlishHudNotepad
             _settingPostItOpacity = settings.DefineSetting("PostItOpacity", 80.0f, () => "Post-It Opacity (unfocused)", () => "Percentage of how Opaque/Transparent the Post It Notes window should be when not focused");
             _settingPostItOpacityFocused = settings.DefineSetting("PostItOpacityFocused", 100.0f, () => "Post-It Opacity (focused)", () => "Percentage of how Opaque/Transparent the Post It Notes window should be when focused");
             _settingPostItAlwaysOnTop = settings.DefineSetting("PostItAlwaysOnTop", false, () => "Post-It Always On Top", () => "When Checked will cause the Post-It window to be on top of any other windows");
-            var PostItHiddenSettings = settings.AddSubCollection("HiddenPostItSettings", false);
-            _settingPostItContents = PostItHiddenSettings.DefineSetting("PostItContents", "Write your notes here!", () => null, () => null);
+            _settingPostItFontSize = settings.DefineSetting("PostItFontSize", "16", () => "Post-It Window Font Size", () => "the font size for the Post-It window");
+            _settingEscClosesPostIt = settings.DefineSetting("PostItEscClosesIt", false, () => "Close Post-It with Esc", () => "Allows Post-It window to be closed by pressing Esc or clicking the close 'x'");
+            _settingPreservePostItContents = settings.DefineSetting("PostItPreserveContents", true, () => "Preserve Post-It Contents", () => "Causes the Post-It window to remember it's content's between runs.");
+            _settingPostItToggleKey = settings.DefineSetting("PostItToggleHotkey", new KeyBinding(ModifierKeys.Ctrl, Keys.P) { Enabled = true, BlockSequenceFromGw2 = true }, () => "Toggle Post-It Hotkey", () => "Hotkey used to toggle the Post-It pad on or off");
 
             _settingShowPostItWindow.SettingChanged += UpdatePostItSettings;
             _settingPostItOpacity.SettingChanged += UpdatePostItSettings;
             _settingPostItOpacityFocused.SettingChanged += UpdatePostItSettings;
-            _settingPostItAlwaysOnTop.SettingChanged += UpdatePostItSettings;
+            _settingPostItAlwaysOnTop.SettingChanged += UpdateAlwaysOnTop;
             _settingPostItSize.SettingChanged += UpdatePostItSettings;
+            _settingPostItFontSize.SettingChanged += UpdatePostItSettings;
+            _settingEscClosesPostIt.SettingChanged += UpdatePostItClosable;
         }
 
         public void Initialize()
         {
 
             PostItFile = "_PostIt";
-            PostItText = FileManager.ReadFile(PostItFile);
+            PostItText = "";
+            if (_settingPreservePostItContents.Value) { PostItText = FileManager.ReadFile(PostItFile); }
 
-            CreatePostIt();
         }
 
+        public async Task LoadAsync()
+        {
+            buildPostItSettingsPanel();
+        }
+
+        public void OnModuleLoaded()
+        {
+            CreatePostIt();
+            SetPostItHotkey();
+        }
         public void Unload()
         {
 
             _settingShowPostItWindow.SettingChanged -= UpdatePostItSettings;
             _settingPostItOpacity.SettingChanged -= UpdatePostItSettings;
             _settingPostItOpacityFocused.SettingChanged -= UpdatePostItSettings;
-            _settingPostItAlwaysOnTop.SettingChanged -= UpdatePostItSettings;
+            _settingPostItAlwaysOnTop.SettingChanged -= UpdateAlwaysOnTop;
             _settingPostItSize.SettingChanged -= UpdatePostItSettings;
+            _settingPostItFontSize.SettingChanged -= UpdatePostItSettings;
+            _settingEscClosesPostIt.SettingChanged -= UpdatePostItClosable;
 
-            _postItWindow.Dispose();
+            _postItTextBox?.Dispose();
+            _postItWindow?.Dispose();
+            _postItSettingsPanel?.Dispose();
         }
         private void UpdatePostItSettings(object sender = null, ValueChangedEventArgs<PostItSize> e = null)
         {
             CreatePostIt();
+        }
+        private void UpdatePostItSettings(object sender = null, ValueChangedEventArgs<String> e = null)
+        {
+            if(_postItWindow != null){
+                _postItTextBox.Font = getFont(_settingPostItFontSize.Value);
+            }
+
         }
         private void UpdatePostItSettings(object sender = null, ValueChangedEventArgs<float> e = null)
         {
@@ -106,6 +143,20 @@ namespace Snaid1.BlishHudNotepad
             else
             {
                 _postItWindow?.Dispose();
+            }
+        }
+        private void UpdateAlwaysOnTop(object sender = null, ValueChangedEventArgs<bool> e = null)
+        {
+            if (_postItWindow != null)
+            {
+                _postItWindow.TopMost = _settingPostItAlwaysOnTop.Value;
+            }
+        }
+        private void UpdatePostItClosable(object sender = null, ValueChangedEventArgs<bool> e = null)
+        {
+            if (_postItWindow != null)
+            {
+                _postItWindow.CanClose = _settingEscClosesPostIt.Value;
             }
         }
 
@@ -155,40 +206,43 @@ namespace Snaid1.BlishHudNotepad
                 TopMost = _settingPostItAlwaysOnTop.Value,
                 Opacity = _settingPostItOpacity.Value / 100,
                 CanResize = false,
-                CanClose = false,
+                CanClose = _settingEscClosesPostIt.Value,
                 HeightSizingMode = SizingMode.Standard,
                 WidthSizingMode = SizingMode.Standard
             };
-            var postItTextBox = new MultilineTextBox()
+            _postItTextBox = new MultilineTextBox()
             {
                 Parent = _postItWindow,
                 PlaceholderText = "Enter notes here ...",
                 Size = ScalePoint(new Point(358, 500), scale),
-                Font = GameService.Content.DefaultFont16,
+                Font = getFont(_settingPostItFontSize.Value),
                 Location = new Point(0, 0),
                 Text = PostItText
 
             };
 
-            _postItWindow.MouseEntered += delegate { mouseOn = true; assignPostItOpacity(mouseOn, postItTextBox.Focused); };
+            _postItWindow.MouseEntered += delegate { mouseOn = true; assignPostItOpacity(mouseOn, _postItTextBox.Focused); };
             _postItWindow.MouseLeft += delegate {
                 mouseOn = false;
-                assignPostItOpacity(mouseOn, postItTextBox.Focused);
+                assignPostItOpacity(mouseOn, _postItTextBox.Focused);
             };
-            //_postItWindow.Resized += delegate { updatePostitSize(); };
 
-            postItTextBox.InputFocusChanged += delegate
+            _postItTextBox.InputFocusChanged += delegate
             {
-                assignPostItOpacity(mouseOn, postItTextBox.Focused);
-                if (postItTextBox.Focused == false)
+                assignPostItOpacity(mouseOn, _postItTextBox.Focused);
+                if (_postItTextBox.Focused == false && _settingPreservePostItContents.Value)
                 {
-                    FileManager.WriteFile(PostItFile, postItTextBox.Text);
+                    FileManager.WriteFile(PostItFile, _postItTextBox.Text);
                 }
             };
+            
 
 
-            _postItWindow.Show();
-            assignPostItOpacity(mouseOn, postItTextBox.Focused);
+            if (_settingShowPostItWindow.Value)
+            {
+                _postItWindow.Show();
+            }
+            assignPostItOpacity(mouseOn, _postItTextBox.Focused);
         }
 
         private void assignPostItOpacity(Boolean mouseOn, Boolean focused)
@@ -229,6 +283,176 @@ namespace Snaid1.BlishHudNotepad
         public void ToggleWindow()
         {
             _postItWindow.ToggleWindow();
+        }
+
+        private BitmapFont getFont(string size)
+        {
+            BitmapFont font = GameService.Content.DefaultFont16;
+
+            switch (_settingPostItFontSize.Value)
+            {
+                case "12":
+                    font = GameService.Content.DefaultFont12;
+                    break;
+                case "14":
+                    font = GameService.Content.DefaultFont14;
+                    break;
+                case "16":
+                    font = GameService.Content.DefaultFont16;
+                    break;
+                case "18":
+                    font = GameService.Content.DefaultFont18;
+                    break;
+                case "32":
+                    font = GameService.Content.DefaultFont32;
+                    break;
+                default:
+                    font = GameService.Content.DefaultFont16;
+                    break;
+            }
+            return font;
+        }
+
+        private Panel buildPostItSettingsPanel()
+        {
+            Panel postItPanel = new Panel()
+            {
+                CanScroll = false,
+                HeightSizingMode = SizingMode.AutoSize,
+                Title = "Post-It Settings"
+            };
+            //checkboxes
+            IView settingShowPostItWindow_View = SettingView.FromType(_settingShowPostItWindow, postItPanel.Width);
+            ViewContainer settingShowPostItWindow_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, 10),
+                Parent = postItPanel
+            };
+            settingShowPostItWindow_Container.Show(settingShowPostItWindow_View);
+
+            IView settingPostItAlwaysOnTop_View = SettingView.FromType(_settingPostItAlwaysOnTop, postItPanel.Width);
+            ViewContainer settingPostItAlwaysOnTop_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(165, 10),
+                Parent = postItPanel
+            };
+            settingPostItAlwaysOnTop_Container.Show(settingPostItAlwaysOnTop_View);
+
+            IView settingEscClosesPostIt_View = SettingView.FromType(_settingEscClosesPostIt, postItPanel.Width);
+            ViewContainer settingEscClosesPostIt_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(340, 10),
+                Parent = postItPanel
+            };
+            settingEscClosesPostIt_Container.Show(settingEscClosesPostIt_View);
+
+            IView settingPreservePostItContents_View = SettingView.FromType(_settingPreservePostItContents, postItPanel.Width);
+            ViewContainer settingPreservePostItContents_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, settingShowPostItWindow_Container.Bottom + 10),
+                Parent = postItPanel
+            };
+            settingPreservePostItContents_Container.Show(settingPreservePostItContents_View);
+            
+            //Drop Down Lists
+            IView settingPostItSize_View = SettingView.FromType(_settingPostItSize, postItPanel.Width);
+            ViewContainer settingPostItSize_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, settingPreservePostItContents_Container.Bottom + 10),
+                Parent = postItPanel
+            };
+            settingPostItSize_Container.Show(settingPostItSize_View);
+
+
+            Label settingPostItFontSize_Label = new Label()
+            {
+                Location = new Point(15, settingPostItSize_Container.Bottom + 13),
+                Width = 100,
+                AutoSizeHeight = false,
+                WrapText = false,
+                Parent = postItPanel,
+                Text = "Post-It Font Size ",
+            };
+            Dropdown settingPostItFontSize_Select = new Dropdown()
+            {
+                Location = new Point(settingPostItFontSize_Label.Right + 8, settingPostItFontSize_Label.Top - 4),
+                Width = 60,
+                Parent = postItPanel,
+            };
+            foreach (var s in _fontSizes)
+            {
+                settingPostItFontSize_Select.Items.Add(s);
+            }
+            settingPostItFontSize_Select.SelectedItem = _settingPostItFontSize.Value;
+            settingPostItFontSize_Select.ValueChanged += delegate {
+                _settingPostItFontSize.Value = settingPostItFontSize_Select.SelectedItem;
+            };
+            
+
+            //Sliders
+            IView settingPostItOpacity_View = SettingView.FromType(_settingPostItOpacity, postItPanel.Width);
+            ViewContainer settingPostItOpacity_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, settingPostItFontSize_Select.Bottom + 7),
+                Parent = postItPanel
+            };
+            settingPostItOpacity_Container.Show(settingPostItOpacity_View);
+
+            IView settingPostItOpacityFocused_View = SettingView.FromType(_settingPostItOpacityFocused, postItPanel.Width);
+            ViewContainer settingPostItOpacityFocused_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, settingPostItOpacity_Container.Bottom + 10),
+                Parent = postItPanel
+            };
+            settingPostItOpacityFocused_Container.Show(settingPostItOpacityFocused_View);
+
+            //Hotkey
+            IView settingPostItToggleKey_View = SettingView.FromType(_settingPostItToggleKey, postItPanel.Width);
+            ViewContainer settingPostItToggleKey_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(15, settingPostItOpacityFocused_Container.Bottom + 10),
+                Parent = postItPanel
+            };
+            settingPostItToggleKey_Container.Show(settingPostItToggleKey_View);
+
+
+            _postItSettingsPanel = postItPanel;
+            return postItPanel;
+            /*
+    internal SettingEntry<string> _settingPostItFontSize;*/
+        }
+        public Panel getPostItSettingPanel(Container parentpanel)
+        {
+            if(_postItSettingsPanel == null) { buildPostItSettingsPanel(); }
+            _postItSettingsPanel.Parent = parentpanel;
+            _postItSettingsPanel.Width = parentpanel.Width;
+            return _postItSettingsPanel;
+        }
+
+        public void SetPostItHotkey()
+        {
+            /*KeyBinding PostItToggleHotkey = new KeyBinding(ModifierKeys.Shift, Keys.P)
+            {
+                Enabled = true,
+                BlockSequenceFromGw2 = true
+            };*/
+            _settingPostItToggleKey.Value.Activated += PostItToggleHotkey_Activated;
+        }
+
+        private void PostItToggleHotkey_Activated(object sender, EventArgs e)
+        {
+            if(_postItWindow != null)
+            {
+                _postItWindow.ToggleWindow();
+            }
         }
     }
 }

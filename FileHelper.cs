@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Snaid1.BlishHudNotepad
+namespace Snaid1.Blishpad
 {
-    class FileHelper
+    public class FileHelper
     {
         internal DirectoriesManager DirectoriesManager;
 

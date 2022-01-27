@@ -3,6 +3,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Settings;
 using Snaid1.Blishpad.Controls;
+using Snaid1.Blishpad.Types;
 using Snaid1.Blishpad.Views;
 using System;
 using System.Collections.Generic;

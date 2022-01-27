@@ -37,7 +37,7 @@ namespace Snaid1.Blishpad.Controls
         {
             if(_window == null)
             {
-                Rectangle windowRec = new Rectangle(-10, 20, 800, 650);
+                Rectangle windowRec = new Rectangle(-10, 20, 1000, 700);
                 Rectangle contentRec = new Rectangle(windowRec.X + 40, windowRec.Y + 5, windowRec.Width - 10, windowRec.Height - 10);
                 _window = new TabbedWindow2(module.ContentsManager.GetTexture(@"textures\155985.png"), windowRec , contentRec)
                 {

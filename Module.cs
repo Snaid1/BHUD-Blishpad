@@ -8,6 +8,7 @@ using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Snaid1.Blishpad.Controls;
+using Snaid1.Blishpad.Utility;
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
@@ -28,7 +29,6 @@ namespace Snaid1.Blishpad
         internal DirectoriesManager DirectoriesManager => this.ModuleParameters.DirectoriesManager;
         internal Gw2ApiManager Gw2ApiManager => this.ModuleParameters.Gw2ApiManager;
         #endregion
-        internal FileHelper FileManager;
 
         [ImportingConstructor]
         public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; notesManager = new NotesManager(this); }
@@ -51,8 +51,8 @@ namespace Snaid1.Blishpad
 
         protected override void Initialize()
         {
-            FileManager = new FileHelper(DirectoriesManager);
-            PostIt.SetManagers(SettingsManager, ContentsManager, DirectoriesManager, Gw2ApiManager, FileManager);
+            FileHelper.NotesDirectory = DirectoriesManager.GetFullDirectoryPath("notes");
+            PostIt.SetManagers(SettingsManager, ContentsManager, DirectoriesManager, Gw2ApiManager);
             PostIt.Initialize();
 
             notesManager.Initialize();

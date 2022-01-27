@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
+using Snaid1.Blishpad.Utility;
 using Snaid1.Blishpad.Views;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,6 @@ namespace Snaid1.Blishpad
         internal ContentsManager ContentsManager;
         internal DirectoriesManager DirectoriesManager;
         internal Gw2ApiManager Gw2ApiManager;
-        internal FileHelper FileManager;
 
         internal enum PostItSize
         {
@@ -56,13 +56,12 @@ namespace Snaid1.Blishpad
 
         private string PostItText;
         private string PostItFile;
-        public void SetManagers(SettingsManager sm, ContentsManager cm, DirectoriesManager dm, Gw2ApiManager apim, FileHelper fm)
+        public void SetManagers(SettingsManager sm, ContentsManager cm, DirectoriesManager dm, Gw2ApiManager apim)
         {
             SettingsManager = sm;
             ContentsManager = cm;
             DirectoriesManager = dm;
             Gw2ApiManager = apim;
-            FileManager = fm;
         }
         public void DefineSettings(SettingCollection settings)
         {
@@ -90,7 +89,7 @@ namespace Snaid1.Blishpad
 
             PostItFile = "_PostIt";
             PostItText = "";
-            if (_settingPreservePostItContents.Value) { PostItText = FileManager.ReadFile(PostItFile); }
+            if (_settingPreservePostItContents.Value) { PostItText = FileHelper.ReadFile(PostItFile); }
 
         }
 
@@ -195,8 +194,8 @@ namespace Snaid1.Blishpad
             Rectangle windowRec = new Rectangle(0, 20, 418, 535);
             Rectangle contentRec = new Rectangle(30, 18, 398, 515);
 
-            windowRec = ScaleRectangle(windowRec, scale);
-            contentRec = ScaleRectangle(contentRec, scale);
+            windowRec = BlishpadUtility.ScaleRectangle(windowRec, scale);
+            contentRec = BlishpadUtility.ScaleRectangle(contentRec, scale);
 
             _postItWindow = new StandardWindow(pageTexture, windowRec, contentRec)
             {
@@ -215,7 +214,7 @@ namespace Snaid1.Blishpad
             {
                 Parent = _postItWindow,
                 PlaceholderText = "Enter notes here ...",
-                Size = ScalePoint(new Point(358, 500), scale),
+                Size = BlishpadUtility.ScalePoint(new Point(358, 500), scale),
                 Font = getFont(_settingPostItFontSize.Value),
                 Location = new Point(0, 0),
                 Text = PostItText
@@ -233,7 +232,7 @@ namespace Snaid1.Blishpad
                 assignPostItOpacity(mouseOn, _postItTextBox.Focused);
                 if (_postItTextBox.Focused == false && _settingPreservePostItContents.Value)
                 {
-                    FileManager.WriteFile(PostItFile, _postItTextBox.Text);
+                    FileHelper.WriteFile(PostItFile, _postItTextBox.Text);
                 }
             };
             
@@ -259,22 +258,6 @@ namespace Snaid1.Blishpad
             {
                 _postItWindow.Opacity = opacityUnfocused;
             }
-        }
-        private int ScaleInt(int num, float scale)
-        {
-            var newNum = Convert.ToInt32(num * scale);
-            return newNum;
-        }
-        private Point ScalePoint(Point point, float scale)
-        {
-            var newPoint = new Point(ScaleInt(point.X, scale), ScaleInt(point.Y, scale));
-            return newPoint;
-        }
-
-        private Rectangle ScaleRectangle(Rectangle rect, float scale)
-        {
-            var newRect = new Rectangle(ScaleInt(rect.X, scale), ScaleInt(rect.Y, scale), ScaleInt(rect.Width, scale), ScaleInt(rect.Height, scale));
-            return newRect;
         }
 
         public void Show()

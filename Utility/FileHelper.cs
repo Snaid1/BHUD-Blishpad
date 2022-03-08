@@ -43,6 +43,32 @@ namespace Snaid1.Blishpad.Utility
             }
             return fileContents;
         }
+        public static void DeleteFile(string filename)
+        {
+            filename = SanitizeFileName(filename);
+            string fileLoc = BuildTxtPath(filename);
+            if (File.Exists(fileLoc))
+            {
+                File.Delete(fileLoc);
+            }
+        }
+        public static void RenameFile(string oldFileName, string newFileName)
+        {
+            if(oldFileName != newFileName)
+            {
+                oldFileName = SanitizeFileName(oldFileName);
+                newFileName = SanitizeFileName(newFileName);
+                string oldfileLoc = BuildTxtPath(oldFileName);
+                string newfileLoc = BuildTxtPath(newFileName);
+
+                if (File.Exists(oldfileLoc) && (File.Exists(newfileLoc) == false))
+                {
+                    WriteFile(newFileName, ReadFile(oldFileName));
+                    DeleteFile(oldFileName);
+                }
+            }
+            
+        }
         private static string BuildTxtPath(string filename)
         {
             return BuildPath(filename, ".txt");

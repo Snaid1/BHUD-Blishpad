@@ -14,18 +14,14 @@ namespace Snaid1.Blishpad.Views
 
     class NotesWindowSettingView : View
     {
-        private NotesWindow notesWindow;
-        private NotesManager notesManager;
 
-        public NotesWindowSettingView(NotesWindow notesWindow)
+        public NotesWindowSettingView()
         {
-            this.notesWindow = notesWindow;
-            this.notesManager = notesWindow.getNotesManager();
         }
 
         protected override void Build(Container buildPanel)
         {
-            IView settingShouldShowNotesView_View = SettingView.FromType(notesManager._settingShouldShowNotesView , buildPanel.Width);
+            IView settingShouldShowNotesView_View = SettingView.FromType(NotesModule._settingShouldShowNotesTab , buildPanel.Width);
             ViewContainer settingShouldShowNotesView_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
@@ -33,8 +29,10 @@ namespace Snaid1.Blishpad.Views
                 Parent = buildPanel
             };
             settingShouldShowNotesView_Container.Show(settingShouldShowNotesView_View);
+
+
         }
-        public Panel buildNotesManagerSettingsPanel()
+        public Panel BuildNotesManagerSettingsPanel()
         {
             Panel NotesSettingPanel = new Panel()
             {
@@ -45,6 +43,14 @@ namespace Snaid1.Blishpad.Views
 
             Build(NotesSettingPanel);
             return NotesSettingPanel;
+        }
+
+        public Panel BuildNotesManagerSettingsPanel(Container parentContainer)
+        {
+            Panel notesPanel = BuildNotesManagerSettingsPanel();
+            notesPanel.Parent = parentContainer;
+            notesPanel.Width = parentContainer.Width;
+            return notesPanel;
         }
     }
 }

@@ -7,55 +7,51 @@ namespace Snaid1.Blishpad.Views
 {
     class SettingsView : View
     {
-        private NotesModule module;
-        public SettingsView(NotesModule notesModule)
+        private Container buildContainer;
+
+        public SettingsView()
         {
-            module = notesModule;
         }
         protected override void Build(Container buildPanel)
         {
-            Panel parentPanel = new Panel()
+            buildContainer = buildPanel;
+
+            Panel parentPanel = new FlowPanel()
             {
                 CanScroll = false,
                 Parent = buildPanel,
                 Height = buildPanel.Height,
-                Width = buildPanel.Width - 20
+                Width = buildPanel.Width - 20,
+                FlowDirection = ControlFlowDirection.SingleTopToBottom
             };
 
-            var PostItPanel = NotesModule.getPostIt().getPostItSettingPanel(parentPanel);
-            if (buildPanel is Panel)
-            {
-                PostItPanel.ShowBorder = false;
-                PostItPanel.Title = "";
-            }
-            
-            var notesPanel = module.GetNotesManagerSettingView(parentPanel);
-            notesPanel.Top = PostItPanel.Top + calcHeight(PostItPanel,0)-40;
-            if (buildPanel is Panel)
-            {
-                notesPanel.ShowBorder = false;
-                notesPanel.Title = "";
-            }
+            var postItPanel = BuildPostItSettingsPanel(parentPanel);
+
+            var notesPanel = BuildNotesManagerSettingsPanel(parentPanel);
         }
 
-        private int calcHeight(Control cont, int max)
+        protected Panel BuildPostItSettingsPanel(Container parentPanel)
         {
-            var newmax = max;
-            if(newmax < cont.Height)
+            PostItSettingView postItSettings = new PostItSettingView();
+            Panel postItPanel = postItSettings.BuildPostItSettingsPanel(parentPanel);
+            if (buildContainer is Panel)
             {
-                newmax = cont.Height;
+                postItPanel.ShowBorder = false;
+                postItPanel.Title = "";
             }
-            if(cont is Container)
+            return postItPanel;
+        }
+
+        protected Panel BuildNotesManagerSettingsPanel(Container parentPanel)
+        {
+            NotesWindowSettingView notesWindowSettings = new NotesWindowSettingView();
+            Panel notesWindowPanel = notesWindowSettings.BuildNotesManagerSettingsPanel(parentPanel);
+            if(buildContainer is Panel)
             {
-                Container container = (Container)cont;
-                var childrenHeight = 0;
-                foreach(Control child in container.Children)
-                {
-                    childrenHeight += calcHeight(child, newmax);
-                }
-                if(newmax < childrenHeight) { newmax = childrenHeight; }
+                notesWindowPanel.ShowBorder = false;
+                notesWindowPanel.Title = "";
             }
-            return newmax;
+            return notesWindowPanel;
         }
     }
 }

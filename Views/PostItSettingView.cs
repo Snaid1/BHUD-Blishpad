@@ -13,17 +13,13 @@ namespace Snaid1.Blishpad.Views
 
     class PostItSettingView : View
     {
-        private PostItWindow postIt;
         public static int totalHeight;
 
-        public PostItSettingView(PostItWindow postIt)
-        {
-            this.postIt = postIt;
-        }
+        public PostItSettingView(){}
         protected override void Build(Container postItPanel)
         {
             //checkboxes
-            IView settingShowPostItWindow_View = SettingView.FromType(postIt._settingShowPostItWindow, postItPanel.Width);
+            IView settingShowPostItWindow_View = SettingView.FromType(NotesModule._settingShowPostItWindow, postItPanel.Width);
             ViewContainer settingShowPostItWindow_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
@@ -32,7 +28,7 @@ namespace Snaid1.Blishpad.Views
             };
             settingShowPostItWindow_Container.Show(settingShowPostItWindow_View);
 
-            IView settingPostItAlwaysOnTop_View = SettingView.FromType(postIt._settingPostItAlwaysOnTop, postItPanel.Width);
+            IView settingPostItAlwaysOnTop_View = SettingView.FromType(NotesModule._settingPostItAlwaysOnTop, postItPanel.Width);
             ViewContainer settingPostItAlwaysOnTop_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
@@ -41,7 +37,7 @@ namespace Snaid1.Blishpad.Views
             };
             settingPostItAlwaysOnTop_Container.Show(settingPostItAlwaysOnTop_View);
 
-            IView settingEscClosesPostIt_View = SettingView.FromType(postIt._settingEscClosesPostIt, postItPanel.Width);
+            IView settingEscClosesPostIt_View = SettingView.FromType(NotesModule._settingEscClosesPostIt, postItPanel.Width);
             ViewContainer settingEscClosesPostIt_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
@@ -50,7 +46,7 @@ namespace Snaid1.Blishpad.Views
             };
             settingEscClosesPostIt_Container.Show(settingEscClosesPostIt_View);
 
-            IView settingPreservePostItContents_View = SettingView.FromType(postIt._settingPreservePostItContents, postItPanel.Width);
+            IView settingPreservePostItContents_View = SettingView.FromType(NotesModule._settingPreservePostItContents, postItPanel.Width);
             ViewContainer settingPreservePostItContents_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
@@ -60,7 +56,7 @@ namespace Snaid1.Blishpad.Views
             settingPreservePostItContents_Container.Show(settingPreservePostItContents_View);
 
             //Drop Down Lists
-            IView settingPostItSize_View = SettingView.FromType(postIt._settingPostItSize, postItPanel.Width);
+            IView settingPostItSize_View = SettingView.FromType(NotesModule._settingPostItSize, postItPanel.Width);
             ViewContainer settingPostItSize_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
@@ -69,43 +65,27 @@ namespace Snaid1.Blishpad.Views
             };
             settingPostItSize_Container.Show(settingPostItSize_View);
 
-
-            Label settingPostItFontSize_Label = new Label()
+            IView settingPostItFontSize_View = new FontSizeSettingView(NotesModule._settingPostItFontSize);
+            ViewContainer settingPostItFontSize_Container = new ViewContainer()
             {
-                Location = new Point(15, settingPostItSize_Container.Bottom + 13),
-                Width = 100,
-                AutoSizeHeight = false,
-                WrapText = false,
-                Parent = postItPanel,
-                Text = "Post-It Font Size ",
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, settingPostItSize_Container.Bottom + 10),
+                Parent = postItPanel
             };
-            Dropdown settingPostItFontSize_Select = new Dropdown()
-            {
-                Location = new Point(settingPostItFontSize_Label.Right + 8, settingPostItFontSize_Label.Top - 4),
-                Width = 60,
-                Parent = postItPanel,
-            };
-            foreach (var s in PostItWindow._fontSizes)
-            {
-                settingPostItFontSize_Select.Items.Add(s);
-            }
-            settingPostItFontSize_Select.SelectedItem = postIt._settingPostItFontSize.Value;
-            settingPostItFontSize_Select.ValueChanged += delegate {
-                postIt._settingPostItFontSize.Value = settingPostItFontSize_Select.SelectedItem;
-            };
+            settingPostItFontSize_Container.Show(settingPostItFontSize_View);
 
 
             //Sliders
-            IView settingPostItOpacity_View = SettingView.FromType(postIt._settingPostItOpacity, postItPanel.Width);
+            IView settingPostItOpacity_View = SettingView.FromType(NotesModule._settingPostItOpacity, postItPanel.Width);
             ViewContainer settingPostItOpacity_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
-                Location = new Point(10, settingPostItFontSize_Select.Bottom + 7),
+                Location = new Point(10, settingPostItFontSize_Container.Bottom + 15),
                 Parent = postItPanel
             };
             settingPostItOpacity_Container.Show(settingPostItOpacity_View);
 
-            IView settingPostItOpacityFocused_View = SettingView.FromType(postIt._settingPostItOpacityFocused, postItPanel.Width);
+            IView settingPostItOpacityFocused_View = SettingView.FromType(NotesModule._settingPostItOpacityFocused, postItPanel.Width);
             ViewContainer settingPostItOpacityFocused_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
@@ -115,7 +95,7 @@ namespace Snaid1.Blishpad.Views
             settingPostItOpacityFocused_Container.Show(settingPostItOpacityFocused_View);
 
             //Hotkey
-            IView settingPostItToggleKey_View = SettingView.FromType(postIt._settingPostItToggleKey, postItPanel.Width);
+            IView settingPostItToggleKey_View = SettingView.FromType(NotesModule._settingPostItToggleKey, postItPanel.Width);
             ViewContainer settingPostItToggleKey_Container = new ViewContainer()
             {
                 WidthSizingMode = SizingMode.Fill,
@@ -127,7 +107,7 @@ namespace Snaid1.Blishpad.Views
             totalHeight = settingPostItToggleKey_Container.Bottom;
         }
 
-        public Panel buildPostItSettingsPanel()
+        public Panel BuildPostItSettingsPanel()
         {
             Panel postItPanel = new Panel()
             {
@@ -137,6 +117,15 @@ namespace Snaid1.Blishpad.Views
             };
             
             Build(postItPanel);
+            return postItPanel;
+        }
+        public Panel BuildPostItSettingsPanel(Container parentPanel)
+        {
+            Panel postItPanel = BuildPostItSettingsPanel();
+
+            postItPanel.Parent = parentPanel;
+            postItPanel.Width = parentPanel.Width;
+            
             return postItPanel;
         }
     }

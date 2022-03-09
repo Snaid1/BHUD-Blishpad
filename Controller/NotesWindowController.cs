@@ -19,10 +19,11 @@ namespace Snaid1.Blishpad.Controller
         //settings
 
         private NotesWindow notesWindow;
-        
+        public ContentsManager contentsManager;
 
         public NotesWindowController(ContentsManager contentsManager)
         {
+            this.contentsManager = contentsManager;
             notesWindow = new NotesWindow(contentsManager, this);
         }
 

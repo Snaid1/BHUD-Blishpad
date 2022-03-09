@@ -86,7 +86,15 @@ namespace Snaid1.Blishpad
 
             _notesIcon = CreateBlishpadIcon();
 
-            _notesIcon.Click += delegate { notesManager.ToggleWindow(); };
+            _notesIcon.Click += delegate {
+                if (_settingShouldShowNotesTab.Value == false && _settingShowPostItWindow.Value == true)
+                {
+                    PostIt.ToggleWindow();
+                }
+                {
+                    notesManager.ToggleWindow();
+                }
+            };
 
             // Base handler must be called
             base.OnModuleLoaded(e);

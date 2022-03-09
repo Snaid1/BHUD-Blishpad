@@ -15,7 +15,7 @@ namespace Snaid1.Blishpad.Views
 {
     class NotesTabView : View
     {
-        private NotesWindow notesWindow;
+        public NotesWindow notesWindow;
         private NotesWindowController notesManager;
         private List<NotesFile> notesFiles;
         private readonly String defaultTitleText = "No Note Selected";
@@ -165,6 +165,7 @@ namespace Snaid1.Blishpad.Views
 
         protected List<NotesFile> FetchFileMenuItems(Menu menu, NotesMultilineTextBox contentsbox, Label titleLabel)
         {
+            CreateAddNewMenuItem(menu);
             notesFiles = new List<NotesFile>();
             String[] filenames = FileHelper.GetAllFilesInNotesDir();
             foreach(string fname in filenames)
@@ -207,6 +208,22 @@ namespace Snaid1.Blishpad.Views
             FetchFileMenuItems(newFilesMenu, noteContentsBox, titleLabel);
             filesMenu.Dispose();
             filesMenu = newFilesMenu;
+        }
+
+        protected MenuItem CreateAddNewMenuItem(Menu menu)
+        {
+            MenuItem newItem = new MenuItem("Create New Note")
+            {
+                Parent = menu,
+                //BackgroundColor = new Microsoft.Xna.Framework.Color(10, 10, 10, 100),
+                BasicTooltipText = "Click here to create a new note",
+                Icon = notesWindow.contentsManager.GetTexture(@"textures\155914b.png")
+            };
+            newItem.Click += delegate
+            {
+                new NoteCreationWindow(notesManager.contentsManager, this).Show();
+            };
+            return newItem;
         }
     }    
 }

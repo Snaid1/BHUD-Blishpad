@@ -19,7 +19,7 @@ namespace Snaid1.Blishpad.Controls
         private TabbedWindow2 _window;
         private NotesWindowController controller;
 
-        private ContentsManager contentsManager;
+        public ContentsManager contentsManager;
 
         private Tab notesTab;
         private Tab settingsTab;

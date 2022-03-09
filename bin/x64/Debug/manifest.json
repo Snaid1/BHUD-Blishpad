@@ -5,9 +5,9 @@
   "package": "Blishpad.dll",
   "manifest_version": 1,
 
-  "description": "A small module for taking and keeping notes",
+  "description": "A module for taking and keeping notes you want to quickly reference.",
   "dependencies": {
-    "bh.blishhud": ">=0.11.4"
+    "bh.blishhud": ">=0.11.6"
   },
   "url": "https://github.com/Snaid1/BHUD-Blishpad",
   "author": {

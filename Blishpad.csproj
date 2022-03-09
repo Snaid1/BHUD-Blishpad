@@ -128,6 +128,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\NoteCreationWindow.cs" />
     <Compile Include="Controls\NotesMultilineTextBox.cs" />
     <Compile Include="Utility\BlishpadUtility.cs" />
     <Compile Include="Utility\FileHelper.cs" />

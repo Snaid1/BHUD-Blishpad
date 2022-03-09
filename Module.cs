@@ -1,12 +1,16 @@
 ﻿using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Overlay.UI.Views;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Snaid1.Blishpad.Controller;
+using Snaid1.Blishpad.Controls;
+using Snaid1.Blishpad.Utility;
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
@@ -27,73 +31,85 @@ namespace Snaid1.Blishpad
         internal DirectoriesManager DirectoriesManager => this.ModuleParameters.DirectoriesManager;
         internal Gw2ApiManager Gw2ApiManager => this.ModuleParameters.Gw2ApiManager;
         #endregion
-        internal FileHelper FileManager;
 
         [ImportingConstructor]
-        public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; }
+        public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; notesManager = new NotesWindowController(ContentsManager); }
 
 
         private static PostItWindow PostIt = new PostItWindow();
+        public PostItWindow postItWindow { get{ return PostIt; } }
+        internal NotesWindowController notesManager;
         //Settings
+        // Post-It Settings
+        public static SettingEntry<bool> _settingShowPostItWindow;
+        public static SettingEntry<float> _settingPostItOpacity;
+        public static SettingEntry<float> _settingPostItOpacityFocused;
+        public static SettingEntry<bool> _settingPostItAlwaysOnTop;
+        public static SettingEntry<PostItWindow.PostItSize> _settingPostItSize;
+        public static SettingEntry<string> _settingPostItFontSize;
+        public static SettingEntry<bool> _settingEscClosesPostIt;
+        public static SettingEntry<bool> _settingPreservePostItContents;
+        public static SettingEntry<KeyBinding> _settingPostItToggleKey;
 
+        // Notes Manager Settings
+        public static SettingEntry<bool> _settingShouldShowNotesTab;
+        public static SettingEntry<string> _settingNotesWindowFontSize;
+        public static SettingEntry<string> _settingNotesWindowSize;
 
-
-        //private TabbedWindow2 _notesWindow;
         private CornerIcon _notesIcon;
 
         protected override void DefineSettings(SettingCollection settings)
         {
-            PostIt?.DefineSettings(settings);
+            PostIt.DefineSettings(settings);
+            notesManager.DefineSettings(settings);
         }
 
         protected override void Initialize()
         {
-            FileManager = new FileHelper(DirectoriesManager);
-            PostIt.SetManagers(SettingsManager, ContentsManager, DirectoriesManager, Gw2ApiManager, FileManager);
+            FileHelper.NotesDirectory = DirectoriesManager.GetFullDirectoryPath("notes");
+            PostIt.ContentsManager = ContentsManager;
             PostIt.Initialize();
 
-            /*_notesWindow = new TabbedWindow2(Blish_HUD.GameService.Content.GetTexture("controls/window/502049"), new Rectangle(0, 0, 545, 630), new Rectangle(82, 30, 467, 600))
-            {
-                Parent = Blish_HUD.GameService.Graphics.SpriteScreen,
-                Title = "TabbedWindow",
-                Emblem = Blish_HUD.GameService.Content.GetTexture("controls/window/156022"),
-                Subtitle = "Example Subtitle",
-                SavesPosition = true,
-                //Id = $"{nameof(ExampleClass)}_ExampleModule_38d37290-b5f9-447d-97ea-45b0b50e5f56"
+            notesManager.Initialize();
+        }
+
+        protected override async Task LoadAsync()
+        {
+            await PostIt.LoadAsync();
+            await notesManager.LoadAsync();
+        }
+
+        protected override void OnModuleLoaded(EventArgs e)
+        {
+            PostIt.OnModuleLoaded();
+            notesManager.OnModuleLoaded();
+
+            _notesIcon = CreateBlishpadIcon();
+
+            _notesIcon.Click += delegate {
+                if (_settingShouldShowNotesTab.Value == false && _settingShowPostItWindow.Value == true)
+                {
+                    PostIt.ToggleWindow();
+                }
+                {
+                    notesManager.ToggleWindow();
+                }
             };
 
-            _notesWindow.Tabs.Add(new Tab(Blish_HUD.GameService.Content.GetTexture("155052"), () => new OverlaySettingsView(), "Settings"));
-            _notesWindow.Tabs.Add(new Tab(Blish_HUD.GameService.Content.GetTexture("155052"), () => new AboutView(), "About Blish HUD"));*/
+            // Base handler must be called
+            base.OnModuleLoaded(e);
+        }
 
-            //_notesWindow.Show();
-
-            
-            
-            
-
-            _notesIcon = new CornerIcon()
+        private CornerIcon CreateBlishpadIcon()
+        {
+           return new CornerIcon()
             {
                 IconName = "Blishpad",
                 Icon = ContentsManager.GetTexture(@"textures\icon.png"),
                 HoverIcon = ContentsManager.GetTexture(@"textures\icon-active.png"),
                 Priority = 5
             };
-
-            _notesIcon.Click += delegate { PostIt.ToggleWindow(); };
         }
-
-        protected override async Task LoadAsync()
-        {
-            PostIt.LoadAsync();
-        }
-
-        protected override void OnModuleLoaded(EventArgs e)
-        {
-            PostIt.OnModuleLoaded();
-            // Base handler must be called
-            base.OnModuleLoaded(e);
-        }
-
         protected override void Update(GameTime gameTime)
         {
 
@@ -105,11 +121,8 @@ namespace Snaid1.Blishpad
             // Unload
             _notesIcon?.Dispose();
 
-            //_notesWindow?.Dispose();
             PostIt?.Unload();
-
-
-
+            notesManager?.Unload();
 
             // All static members must be manually unset
             ModuleInstance = null;
@@ -125,6 +138,7 @@ namespace Snaid1.Blishpad
             Blishpad.Views.SettingsView settingview = new Blishpad.Views.SettingsView();
             return settingview;
         }
+
 
     }
 

@@ -7,22 +7,51 @@ namespace Snaid1.Blishpad.Views
 {
     class SettingsView : View
     {
+        private Container buildContainer;
+
+        public SettingsView()
+        {
+        }
         protected override void Build(Container buildPanel)
         {
-            Panel parentPanel = new Panel()
+            buildContainer = buildPanel;
+
+            Panel parentPanel = new FlowPanel()
             {
                 CanScroll = false,
                 Parent = buildPanel,
                 Height = buildPanel.Height,
-                Width = buildPanel.Width
+                Width = buildPanel.Width - 20,
+                FlowDirection = ControlFlowDirection.SingleTopToBottom
             };
 
-            var PostItPanel = NotesModule.getPostIt().getPostItSettingPanel(parentPanel);
-            if(buildPanel is Panel)
+            var postItPanel = BuildPostItSettingsPanel(parentPanel);
+
+            var notesPanel = BuildNotesManagerSettingsPanel(parentPanel);
+        }
+
+        protected Panel BuildPostItSettingsPanel(Container parentPanel)
+        {
+            PostItSettingView postItSettings = new PostItSettingView();
+            Panel postItPanel = postItSettings.BuildPostItSettingsPanel(parentPanel);
+            if (buildContainer is Panel)
             {
-                PostItPanel.ShowBorder = false;
-                PostItPanel.Title = "";
+                postItPanel.ShowBorder = false;
+                postItPanel.Title = "";
             }
+            return postItPanel;
+        }
+
+        protected Panel BuildNotesManagerSettingsPanel(Container parentPanel)
+        {
+            NotesWindowSettingView notesWindowSettings = new NotesWindowSettingView();
+            Panel notesWindowPanel = notesWindowSettings.BuildNotesManagerSettingsPanel(parentPanel);
+            if(buildContainer is Panel)
+            {
+                notesWindowPanel.ShowBorder = false;
+                notesWindowPanel.Title = "";
+            }
+            return notesWindowPanel;
         }
     }
 }

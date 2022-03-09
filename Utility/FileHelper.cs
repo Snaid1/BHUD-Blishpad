@@ -26,6 +26,12 @@ namespace Snaid1.Blishpad.Utility
             return notesFiles;
         }
 
+        public static string WriteNewFile(string filename, string contents)
+        {
+            filename = RenameIfFileExists(filename);
+            WriteFile(filename, contents);
+            return filename;
+        }
         public static void WriteFile(string filename, string contents)
         {
             filename = SanitizeFileName(filename);
@@ -61,9 +67,9 @@ namespace Snaid1.Blishpad.Utility
                 string oldfileLoc = BuildTxtPath(oldFileName);
                 string newfileLoc = BuildTxtPath(newFileName);
 
-                if (File.Exists(oldfileLoc) && (File.Exists(newfileLoc) == false))
+                if (File.Exists(oldfileLoc))
                 {
-                    WriteFile(newFileName, ReadFile(oldFileName));
+                    WriteNewFile(newFileName, ReadFile(oldFileName));
                     DeleteFile(oldFileName);
                 }
             }
@@ -93,6 +99,21 @@ namespace Snaid1.Blishpad.Utility
         public static string StripExtension(string filename)
         {
             return Path.GetFileNameWithoutExtension(filename);
+        }
+
+        private static string RenameIfFileExists(string fileName)
+        {
+            string newFileName = fileName;
+            string fileLoc = BuildTxtPath(fileName);
+            int index = 1;
+            while (File.Exists(fileLoc))
+            {
+                newFileName = fileName + "[" + index + "]";
+                fileLoc = BuildTxtPath(newFileName);
+                index++;
+                if (index > 100) { break; }
+            }
+            return newFileName;
         }
     }
 }

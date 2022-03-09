@@ -24,6 +24,19 @@ namespace Snaid1.Blishpad.Views
         private NotesMultilineTextBox noteContentsBox;
         private Menu filesMenu;
 
+        public bool NewNoteNotInProcess = true;
+        private string _newNoteName;
+        public string newNoteName {
+            get { return _newNoteName; } 
+            set {
+                NewNoteNotInProcess = true;
+                _newNoteName = value;
+                RedrawFileMenu();
+                Initialize();
+                _newNoteName = "";
+            } 
+        }
+
         public NotesTabView(NotesWindow nwin)
         {
             notesWindow = nwin;
@@ -187,8 +200,23 @@ namespace Snaid1.Blishpad.Views
         {
             if(notesFiles.Count > 0)
             {
-                notesFiles[0].MenuItem.Select();
-                notesFiles[0].HandleItemSelected(this,null);
+                if(newNoteName != null && newNoteName != "")
+                {
+                    for(int i = 0; i < notesFiles.Count(); i++)
+                    {
+                        if(notesFiles[i].Title == newNoteName)
+                        {
+                            notesFiles[i].MenuItem.Select();
+                            notesFiles[i].HandleItemSelected(this, null);
+                            break;
+                        }
+                    }
+                } 
+                else
+                {
+                    notesFiles[0].MenuItem.Select();
+                    notesFiles[0].HandleItemSelected(this, null);
+                }
             } else
             {
                 titleLabel.Text = defaultTitleText;
@@ -221,7 +249,10 @@ namespace Snaid1.Blishpad.Views
             };
             newItem.Click += delegate
             {
-                new NoteCreationWindow(notesManager.contentsManager, this).Show();
+                if (NewNoteNotInProcess)
+                {
+                    new NoteCreationWindow(notesManager.contentsManager, this).Show();
+                }
             };
             return newItem;
         }

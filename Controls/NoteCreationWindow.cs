@@ -1,6 +1,7 @@
 ﻿using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework;
+using Snaid1.Blishpad.Utility;
 using Snaid1.Blishpad.Views;
 using System;
 using System.Collections.Generic;
@@ -17,9 +18,12 @@ namespace Snaid1.Blishpad.Controls
         private readonly int windowwidth = 555;
         private readonly int windowheight = 130;
 
+        private string newTitle;
+
         public NoteCreationWindow(ContentsManager contentsManager, NotesTabView notesTabView, String windowTitle = "New Note")
         {
             parentView = notesTabView;
+            parentView.NewNoteNotInProcess = false;
             Rectangle windowRect = new Rectangle(18, 10, windowwidth, windowheight);
             Rectangle contentRect = new Rectangle(windowRect.X + 10, windowRect.Y + 25, windowwidth - 20, windowheight - 10);
             Rectangle parentBounds = parentView.notesWindow.getWindow().AbsoluteBounds;
@@ -27,7 +31,7 @@ namespace Snaid1.Blishpad.Controls
             {
                 Parent = Blish_HUD.GameService.Graphics.SpriteScreen,
                 Title = windowTitle,
-                CanClose = true,
+                CanClose = false,
                 TopMost = true,
                 SavesPosition = false,
                 Left = parentBounds.X + (parentBounds.Width / 2) - (windowwidth / 2) + 23,
@@ -89,7 +93,17 @@ namespace Snaid1.Blishpad.Controls
                 Parent = titlepanel,
                 Font = Blish_HUD.ContentService.Content.DefaultFont32,
                 Width = titlepanel.Width - titleLabel.Width - 22,
+                Focused = true
             };
+            titleTextBox.TextChanged += delegate
+            {
+                newTitle = titleTextBox.Text;
+            };
+            titleTextBox.EnterPressed += delegate
+            {
+                SaveFile();
+            };
+
             //Button Panel Contents
             StandardButton CancelButton = new StandardButton()
             {
@@ -98,8 +112,7 @@ namespace Snaid1.Blishpad.Controls
             };
             CancelButton.Click += delegate
             {
-                _NoteCreationWindow.Hide();
-                _NoteCreationWindow.Dispose();
+                Close();
                 
             };
 
@@ -108,6 +121,20 @@ namespace Snaid1.Blishpad.Controls
                 Text = "Save",
                 Parent = buttonPanel
             };
+            SaveButton.Click += delegate { SaveFile(); };
+        }
+
+        private void SaveFile()
+        {
+            parentView.newNoteName = FileHelper.WriteNewFile(newTitle, "");
+            Close();
+        }
+
+        public void Close()
+        {
+            parentView.NewNoteNotInProcess = true;
+            _NoteCreationWindow.Hide();
+            _NoteCreationWindow.Dispose();
         }
     }
 }

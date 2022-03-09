@@ -37,7 +37,7 @@ namespace Snaid1.Blishpad
         }
 
         private StandardWindow _postItWindow { get; set; }
-        private NotesMultilineTextBox _postItTextBox;       
+        private NotesMultilineTextBox _postItTextBox;
 
 
         private string PostItText;
@@ -214,7 +214,6 @@ namespace Snaid1.Blishpad
             };
             
 
-
             if (NotesModule._settingShowPostItWindow.Value)
             {
                 _postItWindow.Show();
@@ -247,15 +246,6 @@ namespace Snaid1.Blishpad
             NotesModule._settingShowPostItWindow.Value = (NotesModule._settingShowPostItWindow.Value == false);
             _postItWindow.ToggleWindow();
         }
-
-        
-        /*public Panel getPostItSettingPanel(Container parentpanel)
-        {
-            if(_postItSettingsPanel == null) { _postItSettingsPanel = new PostItSettingView(this).buildPostItSettingsPanel(); }
-            _postItSettingsPanel.Parent = parentpanel;
-            _postItSettingsPanel.Width = parentpanel.Width;
-            return _postItSettingsPanel;
-        }*/
 
         public void SetPostItHotkey()
         {

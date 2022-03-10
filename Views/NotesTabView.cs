@@ -23,6 +23,7 @@ namespace Snaid1.Blishpad.Views
         private Label titleLabel;
         private NotesMultilineTextBox noteContentsBox;
         private Menu filesMenu;
+        private FlowPanel buttonsPanel;
 
         public bool NewNoteNotInProcess = true;
         private string _newNoteName;
@@ -100,8 +101,9 @@ namespace Snaid1.Blishpad.Views
                 Height = BlishpadUtility.ScaleInt(contentsPanel.Height, 0.75f),
                 Width = contentsPanel.Width
             };
+            FetchFileMenuItems(filesMenu, noteContentsBox, titleLabel);
 
-            FlowPanel buttonsPanel = new FlowPanel()
+            buttonsPanel = new FlowPanel()
             {
                 Parent = contentsPanel,
                 //HeightSizingMode = SizingMode.AutoSize,
@@ -129,7 +131,6 @@ namespace Snaid1.Blishpad.Views
             };
             reloadButton.Click += delegate { noteContentsBox.Reload(); };
 
-            FetchFileMenuItems(filesMenu, noteContentsBox, titleLabel);
             
             StandardButton copyToPostItButton = new StandardButton()
             {
@@ -217,10 +218,21 @@ namespace Snaid1.Blishpad.Views
                     notesFiles[0].MenuItem.Select();
                     notesFiles[0].HandleItemSelected(this, null);
                 }
+                noteContentsBox.Enabled = true;
+                buttonsPanel.Enabled = true;
+                foreach(Control bpButton in buttonsPanel.Children){
+                    bpButton.Enabled = true;
+                }
             } else
             {
                 titleLabel.Text = defaultTitleText;
                 noteContentsBox.Text = "";
+                noteContentsBox.Enabled = false;
+                buttonsPanel.Enabled = false;
+                foreach (Control bpButton in buttonsPanel.Children)
+                {
+                    bpButton.Enabled = false;
+                }
             }
         }
 

@@ -39,6 +39,7 @@ namespace Snaid1.Blishpad
         private StandardWindow _postItWindow { get; set; }
         private NotesMultilineTextBox _postItTextBox;
 
+        private KeyBinding escKey = new KeyBinding(Keys.Escape) { Enabled = false, BlockSequenceFromGw2 = true };
 
         private string PostItText;
         private string PostItFile;
@@ -50,7 +51,7 @@ namespace Snaid1.Blishpad
             NotesModule._settingPostItOpacityFocused = settings.DefineSetting("PostItOpacityFocused", 100.0f, () => "Post-It Opacity (focused)", () => "Percentage of how Opaque/Transparent the Post It Notes window should be when focused");
             NotesModule._settingPostItAlwaysOnTop = settings.DefineSetting("PostItAlwaysOnTop", false, () => "Post-It Always On Top", () => "When Checked will cause the Post-It window to be on top of any other windows");
             NotesModule._settingPostItFontSize = settings.DefineSetting("PostItFontSize", "16", () => "Post-It Font Size", () => "the font size for the Post-It window");
-            NotesModule._settingEscClosesPostIt = settings.DefineSetting("PostItEscClosesIt", false, () => "Close Post-It with Esc", () => "Allows Post-It window to be closed by pressing Esc or clicking the close 'x'");
+            NotesModule._settingEscClosesPostIt = settings.DefineSetting("PostItEscClosesIt", true, () => "Close Post-It with Esc", () => "Allows Post-It window to be closed by pressing Esc or clicking the close 'x'");
             NotesModule._settingPreservePostItContents = settings.DefineSetting("PostItPreserveContents", true, () => "Preserve Post-It Contents", () => "Causes the Post-It window to remember it's content's between runs.");
             NotesModule._settingPostItToggleKey = settings.DefineSetting("PostItToggleHotkey", new KeyBinding(ModifierKeys.Ctrl, Keys.P) { Enabled = true, BlockSequenceFromGw2 = true }, () => "Toggle Post-It Hotkey", () => "Hotkey used to toggle the Post-It pad on or off");
 
@@ -60,7 +61,13 @@ namespace Snaid1.Blishpad
             NotesModule._settingPostItAlwaysOnTop.SettingChanged += UpdateAlwaysOnTop;
             NotesModule._settingPostItSize.SettingChanged += UpdatePostItSize;
             NotesModule._settingPostItFontSize.SettingChanged += UpdatePostItFontSize;
-            NotesModule._settingEscClosesPostIt.SettingChanged += UpdatePostItClosable;
+            //NotesModule._settingEscClosesPostIt.SettingChanged += UpdatePostItClosable;
+
+            escKey.Activated += delegate
+            {
+                NotesModule._settingShowPostItWindow.Value = false;
+                _postItWindow.Hide();
+            };
         }
 
         public void Initialize()
@@ -90,7 +97,6 @@ namespace Snaid1.Blishpad
             NotesModule._settingPostItAlwaysOnTop.SettingChanged -= UpdateAlwaysOnTop;
             NotesModule._settingPostItSize.SettingChanged -= UpdatePostItSize;
             NotesModule._settingPostItFontSize.SettingChanged -= UpdatePostItFontSize;
-            NotesModule._settingEscClosesPostIt.SettingChanged -= UpdatePostItClosable;
 
             _postItTextBox?.Dispose();
             _postItWindow?.Dispose();
@@ -183,10 +189,11 @@ namespace Snaid1.Blishpad
                 TopMost = NotesModule._settingPostItAlwaysOnTop.Value,
                 Opacity = NotesModule._settingPostItOpacity.Value / 100,
                 CanResize = false,
-                CanClose = NotesModule._settingEscClosesPostIt.Value,
+                CanClose = false,
                 HeightSizingMode = SizingMode.Standard,
                 WidthSizingMode = SizingMode.Standard
             };
+
             _postItTextBox = new NotesMultilineTextBox(new Types.NotesFile(PostItFile, null))
             {
                 Parent = _postItWindow,
@@ -229,10 +236,12 @@ namespace Snaid1.Blishpad
             if (focused || mouseOn)
             {
                 _postItWindow.Opacity = opacityFocused;
+                escKey.Enabled = true && NotesModule._settingEscClosesPostIt.Value;
             }
             else
             {
                 _postItWindow.Opacity = opacityUnfocused;
+                escKey.Enabled = false;
             }
         }
 
@@ -254,10 +263,7 @@ namespace Snaid1.Blishpad
 
         private void PostItToggleHotkey_Activated(object sender, EventArgs e)
         {
-            if(_postItWindow != null)
-            {
-                _postItWindow.ToggleWindow();
-            }
+            ToggleWindow();
         }
 
         public void CopyToPostIt(NotesFile nf)

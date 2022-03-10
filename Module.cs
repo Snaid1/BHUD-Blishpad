@@ -40,6 +40,8 @@ namespace Snaid1.Blishpad
         public PostItWindow postItWindow { get{ return PostIt; } }
         internal NotesWindowController notesManager;
         //Settings
+        public static SettingEntry<bool> _settingIconTogglesPostIt;
+
         // Post-It Settings
         public static SettingEntry<bool> _settingShowPostItWindow;
         public static SettingEntry<float> _settingPostItOpacity;
@@ -54,7 +56,6 @@ namespace Snaid1.Blishpad
         // Notes Manager Settings
         public static SettingEntry<bool> _settingShouldShowNotesTab;
         public static SettingEntry<string> _settingNotesWindowFontSize;
-        public static SettingEntry<string> _settingNotesWindowSize;
 
         private CornerIcon _notesIcon;
 
@@ -62,6 +63,8 @@ namespace Snaid1.Blishpad
         {
             PostIt.DefineSettings(settings);
             notesManager.DefineSettings(settings);
+
+            _settingIconTogglesPostIt = settings.DefineSetting("IconTogglesPostIt", false, () => "Icon Toggles Post-It", () => "If enabled, causes the icon to toggle the Post-It instead of opening the Blishpad Window.");
         }
 
         protected override void Initialize()
@@ -87,10 +90,10 @@ namespace Snaid1.Blishpad
             _notesIcon = CreateBlishpadIcon();
 
             _notesIcon.Click += delegate {
-                if (_settingShouldShowNotesTab.Value == false && _settingShowPostItWindow.Value == true)
+                if (_settingIconTogglesPostIt.Value)
                 {
                     PostIt.ToggleWindow();
-                }
+                } else
                 {
                     notesManager.ToggleWindow();
                 }

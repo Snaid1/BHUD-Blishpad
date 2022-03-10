@@ -28,6 +28,8 @@ namespace Snaid1.Blishpad.Views
             var postItPanel = BuildPostItSettingsPanel(parentPanel);
 
             var notesPanel = BuildNotesManagerSettingsPanel(parentPanel);
+
+            var generalPanel = BuildGeneralSettingsPanel(parentPanel);
         }
 
         protected Panel BuildPostItSettingsPanel(Container parentPanel)
@@ -52,6 +54,18 @@ namespace Snaid1.Blishpad.Views
                 notesWindowPanel.Title = "";
             }
             return notesWindowPanel;
+        }
+
+        protected Panel BuildGeneralSettingsPanel(Container parentPanel)
+        {
+            GeneralSettingView generalSettings = new GeneralSettingView();
+            Panel generalPanel = generalSettings.BuildGeneralSettingsPanel(parentPanel);
+            if(buildContainer is Panel)
+            {
+                generalPanel.ShowBorder = false;
+                generalPanel.Title = "";
+            }
+            return generalPanel;
         }
     }
 }

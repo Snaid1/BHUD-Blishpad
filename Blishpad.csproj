@@ -138,6 +138,7 @@
     <Compile Include="PostItWindow.cs" />
     <Compile Include="Types\NotesFile.cs" />
     <Compile Include="Views\FontSizeSettingView.cs" />
+    <Compile Include="Views\GeneralSettingView.cs" />
     <Compile Include="Views\NotesWindowSettingView.cs" />
     <Compile Include="Views\NotesTabView.cs" />
     <Compile Include="Views\PostItSettingView.cs" />

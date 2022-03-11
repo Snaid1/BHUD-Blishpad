@@ -33,12 +33,12 @@ namespace Snaid1.Blishpad
         #endregion
 
         [ImportingConstructor]
-        public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; notesManager = new NotesWindowController(ContentsManager); }
+        public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; _notesManager = new NotesWindowController(ContentsManager); }
 
 
         private static PostItWindow PostIt = new PostItWindow();
+        public static NotesWindowController _notesManager;
         public PostItWindow postItWindow { get{ return PostIt; } }
-        internal NotesWindowController notesManager;
         //Settings
         public static SettingEntry<bool> _settingIconTogglesPostIt;
 
@@ -62,7 +62,7 @@ namespace Snaid1.Blishpad
         protected override void DefineSettings(SettingCollection settings)
         {
             PostIt.DefineSettings(settings);
-            notesManager.DefineSettings(settings);
+            _notesManager.DefineSettings(settings);
 
             _settingIconTogglesPostIt = settings.DefineSetting("IconTogglesPostIt", false, () => "Icon Toggles Post-It", () => "If enabled, causes the icon to toggle the Post-It instead of opening the Blishpad Window.");
         }
@@ -73,19 +73,19 @@ namespace Snaid1.Blishpad
             PostIt.ContentsManager = ContentsManager;
             PostIt.Initialize();
 
-            notesManager.Initialize();
+            _notesManager.Initialize();
         }
 
         protected override async Task LoadAsync()
         {
             await PostIt.LoadAsync();
-            await notesManager.LoadAsync();
+            await _notesManager.LoadAsync();
         }
 
         protected override void OnModuleLoaded(EventArgs e)
         {
             PostIt.OnModuleLoaded();
-            notesManager.OnModuleLoaded();
+            _notesManager.OnModuleLoaded();
 
             _notesIcon = CreateBlishpadIcon();
 
@@ -95,7 +95,7 @@ namespace Snaid1.Blishpad
                     PostIt.ToggleWindow();
                 } else
                 {
-                    notesManager.ToggleWindow();
+                    _notesManager.ToggleWindow();
                 }
             };
 
@@ -125,9 +125,23 @@ namespace Snaid1.Blishpad
             _notesIcon?.Dispose();
 
             PostIt?.Unload();
-            notesManager?.Unload();
+            _notesManager?.Unload();
 
             // All static members must be manually unset
+            _settingIconTogglesPostIt = null;
+            _settingShowPostItWindow = null;
+            _settingPostItOpacity = null;
+            _settingPostItOpacityFocused = null;
+            _settingPostItAlwaysOnTop = null;
+            _settingPostItSize = null;
+            _settingPostItFontSize = null;
+            _settingEscClosesPostIt = null;
+            _settingPreservePostItContents = null;
+            _settingPostItToggleKey = null;
+            _settingShouldShowNotesTab = null;
+            _settingNotesManagerFontSize = null;
+
+            PostIt = null;
             ModuleInstance = null;
         }
 
@@ -138,7 +152,7 @@ namespace Snaid1.Blishpad
 
         public override IView GetSettingsView()
         {
-            Blishpad.Views.SettingsView settingview = new Blishpad.Views.SettingsView();
+            Blishpad.Views.SettingRedirectView settingview = new Blishpad.Views.SettingRedirectView();
             return settingview;
         }
 

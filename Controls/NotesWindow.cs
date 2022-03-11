@@ -23,7 +23,7 @@ namespace Snaid1.Blishpad.Controls
 
         public Tab notesTab;
         public NotesTabView notesTabContents;
-        private Tab settingsTab;
+        public Tab settingsTab;
 
         public NotesWindow(ContentsManager contentsManager, NotesWindowController notesWindowController)
         {
@@ -104,6 +104,11 @@ namespace Snaid1.Blishpad.Controls
         public NotesWindowController GetNotesWindowController()
         {
             return controller;
+        }
+        public void OpenSettings()
+        {
+            _window.SelectedTab = settingsTab;
+            _window.Show();
         }
     }
 }

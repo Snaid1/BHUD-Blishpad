@@ -15,7 +15,7 @@ using Snaid1.Blishpad.Utility;
 
 namespace Snaid1.Blishpad.Controller
 {
-    class NotesWindowController
+    public class NotesWindowController
     {
         //settings
 
@@ -43,6 +43,10 @@ namespace Snaid1.Blishpad.Controller
             notesWindow.ToggleWindow();
         }
 
+        public void OpenSettings()
+        {
+            notesWindow.OpenSettings();
+        }
         internal void DefineSettings(SettingCollection settings)
         {
             NotesModule._settingShouldShowNotesTab = settings.DefineSetting("ShouldShowNotesView", true, () => "Enable Notes Manager Page", () => "Enables the notes tab in the Notes Manager window");

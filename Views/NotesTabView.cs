@@ -22,6 +22,7 @@ namespace Snaid1.Blishpad.Views
 
         private Label titleLabel;
         private NotesMultilineTextBox noteContentsBox;
+        public NotesMultilineTextBox NoteContentsBox { get; }
         private Menu filesMenu;
         private FlowPanel buttonsPanel;
 
@@ -99,6 +100,7 @@ namespace Snaid1.Blishpad.Views
             {
                 Parent = contentsPanel,
                 Height = BlishpadUtility.ScaleInt(contentsPanel.Height, 0.75f),
+                Font = BlishpadUtility.getFont(NotesModule._settingNotesManagerFontSize.Value),
                 Width = contentsPanel.Width
             };
             FetchFileMenuItems(filesMenu, noteContentsBox, titleLabel);

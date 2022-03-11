@@ -30,7 +30,14 @@ namespace Snaid1.Blishpad.Views
             };
             settingShouldShowNotesView_Container.Show(settingShouldShowNotesView_View);
 
-
+            IView settingNotesManagerFontSize_View = new FontSizeSettingView(NotesModule._settingNotesManagerFontSize, 160);
+            ViewContainer settingNotesManagerFontSize_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, settingShouldShowNotesView_Container.Bottom + 10),
+                Parent = buildPanel
+            };
+            settingNotesManagerFontSize_Container.Show(settingNotesManagerFontSize_View);
         }
         public Panel BuildNotesManagerSettingsPanel()
         {

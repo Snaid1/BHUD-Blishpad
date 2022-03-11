@@ -14,10 +14,12 @@ namespace Snaid1.Blishpad.Views
     {
         private SettingEntry<string> settingEntry;
         public static String[] _fontSizes = new string[] { "12", "14", "16", "18", "32" };
+        private int textwidth;
 
-        public FontSizeSettingView(SettingEntry<string> se)
+        public FontSizeSettingView(SettingEntry<string> se, int width = 100)
         {
             settingEntry = se;
+            textwidth = width;
         }
 
         protected override void Build(Container parentContainer)
@@ -25,7 +27,7 @@ namespace Snaid1.Blishpad.Views
             Label fontSize_Label = new Label()
             {
                 Location = new Point(5, 4),
-                Width = 100,
+                Width = textwidth,
                 AutoSizeHeight = false,
                 WrapText = false,
                 Parent = parentContainer,

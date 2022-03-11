@@ -21,7 +21,8 @@ namespace Snaid1.Blishpad.Controls
 
         public ContentsManager contentsManager;
 
-        private Tab notesTab;
+        public Tab notesTab;
+        public NotesTabView notesTabContents;
         private Tab settingsTab;
 
         public NotesWindow(ContentsManager contentsManager, NotesWindowController notesWindowController)
@@ -84,7 +85,8 @@ namespace Snaid1.Blishpad.Controls
 
         internal void OnModuleLoaded()
         {
-            notesTab = new Tab(contentsManager.GetTexture(@"textures/icon.png"), () => new NotesTabView(this), "Notes");
+            notesTabContents = new NotesTabView(this);
+            notesTab = new Tab(contentsManager.GetTexture(@"textures/icon.png"), () => notesTabContents, "Notes Manager");
             settingsTab = new Tab(Blish_HUD.GameService.Content.GetTexture("155052"), () => new SettingsView(), "Settings");
             BuildWindow();
         }

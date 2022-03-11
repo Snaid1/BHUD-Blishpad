@@ -55,7 +55,7 @@ namespace Snaid1.Blishpad
 
         // Notes Manager Settings
         public static SettingEntry<bool> _settingShouldShowNotesTab;
-        public static SettingEntry<string> _settingNotesWindowFontSize;
+        public static SettingEntry<string> _settingNotesManagerFontSize;
 
         private CornerIcon _notesIcon;
 

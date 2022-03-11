@@ -18,10 +18,14 @@ namespace Snaid1.Blishpad.Controls
         private readonly int windowwidth = 555;
         private readonly int windowheight = 130;
 
+        private Boolean isRename;
+        private string defaultTitle;
         private string newTitle;
 
-        public NoteCreationWindow(ContentsManager contentsManager, NotesTabView notesTabView, String windowTitle = "New Note")
+        public NoteCreationWindow(ContentsManager contentsManager, NotesTabView notesTabView, String windowTitle = "New Note", String defaultTitle = "")
         {
+            isRename = (windowTitle != "New Note");
+            this.defaultTitle = defaultTitle;
             parentView = notesTabView;
             parentView.NewNoteNotInProcess = false;
             Rectangle windowRect = new Rectangle(18, 10, windowwidth, windowheight);
@@ -38,14 +42,6 @@ namespace Snaid1.Blishpad.Controls
                 Top = parentBounds.Y + (parentBounds.Height / 2) - (windowheight / 2)
             };
             BuildWindowView(_NoteCreationWindow);
-        }
-
-        private Rectangle CalculateWindowDimentions()
-        {
-            Rectangle parentBounds = parentView.notesWindow.getWindow().AbsoluteBounds;
-            int x = parentBounds.X + (parentBounds.Width / 2) - (windowwidth / 2);
-            int y = parentBounds.Y + (parentBounds.Height / 2) - (windowheight / 2);
-            return new Rectangle(x, y, windowwidth, windowheight);
         }
 
         public void Show()
@@ -93,7 +89,8 @@ namespace Snaid1.Blishpad.Controls
                 Parent = titlepanel,
                 Font = Blish_HUD.ContentService.Content.DefaultFont32,
                 Width = titlepanel.Width - titleLabel.Width - 22,
-                Focused = true
+                Focused = true,
+                Text = defaultTitle
             };
             titleTextBox.TextChanged += delegate
             {
@@ -126,7 +123,13 @@ namespace Snaid1.Blishpad.Controls
 
         private void SaveFile()
         {
-            parentView.newNoteName = FileHelper.WriteNewFile(newTitle, "");
+            if (isRename)
+            {
+                parentView.newNoteName = FileHelper.RenameFile(defaultTitle, newTitle);
+            } else
+            {
+                parentView.newNoteName = FileHelper.WriteNewFile(newTitle, "");
+            }
             Close();
         }
 

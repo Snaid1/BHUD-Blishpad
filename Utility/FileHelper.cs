@@ -58,7 +58,7 @@ namespace Snaid1.Blishpad.Utility
                 File.Delete(fileLoc);
             }
         }
-        public static void RenameFile(string oldFileName, string newFileName)
+        public static string RenameFile(string oldFileName, string newFileName)
         {
             if(oldFileName != newFileName)
             {
@@ -69,11 +69,11 @@ namespace Snaid1.Blishpad.Utility
 
                 if (File.Exists(oldfileLoc))
                 {
-                    WriteNewFile(newFileName, ReadFile(oldFileName));
+                    newFileName = WriteNewFile(newFileName, ReadFile(oldFileName));
                     DeleteFile(oldFileName);
                 }
             }
-            
+            return newFileName;
         }
         private static string BuildTxtPath(string filename)
         {

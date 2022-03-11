@@ -11,10 +11,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
+using Snaid1.Blishpad.Utility;
 
 namespace Snaid1.Blishpad.Controller
 {
-    class NotesWindowController
+    public class NotesWindowController
     {
         //settings
 
@@ -42,11 +43,24 @@ namespace Snaid1.Blishpad.Controller
             notesWindow.ToggleWindow();
         }
 
+        public void OpenSettings()
+        {
+            notesWindow.OpenSettings();
+        }
         internal void DefineSettings(SettingCollection settings)
         {
             NotesModule._settingShouldShowNotesTab = settings.DefineSetting("ShouldShowNotesView", true, () => "Enable Notes Manager Page", () => "Enables the notes tab in the Notes Manager window");
+            NotesModule._settingNotesManagerFontSize = settings.DefineSetting("NotesManagerFontSize", "16", () => "Notes Manager Font Size", () => "The font size for the Notes Manager tab");
 
             NotesModule._settingShouldShowNotesTab.SettingChanged += ChangeShouldShowNotesView;
+            NotesModule._settingNotesManagerFontSize.SettingChanged += delegate
+            {
+                if(notesWindow?.notesTabContents?.NoteContentsBox?.Font != null)
+                {
+                    notesWindow.notesTabContents.NoteContentsBox.Font = BlishpadUtility.getFont(NotesModule._settingNotesManagerFontSize.Value);
+                }
+            };
+
         }
 
         private void ChangeShouldShowNotesView(object sender, ValueChangedEventArgs<bool> e)

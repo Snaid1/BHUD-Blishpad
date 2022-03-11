@@ -142,6 +142,7 @@
     <Compile Include="Views\NotesWindowSettingView.cs" />
     <Compile Include="Views\NotesTabView.cs" />
     <Compile Include="Views\PostItSettingView.cs" />
+    <Compile Include="Views\SettingRedirectView.cs" />
     <Compile Include="Views\SettingsView.cs" />
   </ItemGroup>
   <ItemGroup>

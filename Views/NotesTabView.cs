@@ -1,5 +1,6 @@
 ﻿using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using Microsoft.Xna.Framework;
 using Snaid1.Blishpad.Controller;
 using Snaid1.Blishpad.Controls;
 using Snaid1.Blishpad.Types;
@@ -87,14 +88,42 @@ namespace Snaid1.Blishpad.Views
                 Width = filesPanel.Width
             };
 
+            Panel TitlePanel = new Panel()
+            {
+                Parent = contentsPanel,
+                Width = contentsPanel.Width,
+                Height = BlishpadUtility.ScaleInt(contentsPanel.Height, 0.1f),
+                //FlowDirection = ControlFlowDirection.LeftToRight
+            };
+            Image renameButton = new Image(notesWindow.contentsManager.GetTexture(@"textures\renameiconoff.png"))
+            {
+                Parent = TitlePanel,
+                Width = 32,
+                Height = 32,
+                Location = new Point(0, (TitlePanel.Height / 2) - 16),
+                Top = (TitlePanel.Height/2) - 16,
+                BasicTooltipText = "Rename Note",
+            };
+            renameButton.MouseEntered += delegate { renameButton.Texture = notesWindow.contentsManager.GetTexture(@"textures\renameicon.png"); };
+            renameButton.MouseLeft += delegate { renameButton.Texture = notesWindow.contentsManager.GetTexture(@"textures\renameiconoff.png"); };
+            renameButton.Click += delegate
+            {
+                if (NewNoteNotInProcess)
+                {
+                    new NoteCreationWindow(notesManager.contentsManager, this, "Rename Note", titleLabel.Text).Show();
+                }
+            };
+
             titleLabel = new Label()
             {
                 Text = defaultTitleText,
                 Font = Blish_HUD.ContentService.Content.DefaultFont32,
-                Parent = contentsPanel,
-                Height = BlishpadUtility.ScaleInt(contentsPanel.Height, 0.1f),
-                Width = contentsPanel.Width
+                Parent = TitlePanel,
+                Height = TitlePanel.Height,
+                Width = TitlePanel.Width - 36,
+                Left = 36
             };
+
 
             noteContentsBox = new NotesMultilineTextBox()
             {

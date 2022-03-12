@@ -9,10 +9,13 @@
     "bh.blishhud": ">=0.11.6"
   },
   "url": "https://github.com/Snaid1/BHUD-Blishpad",
-  "author": {
-    "name": "Snaid1",
-    "url": "https://github.com/Snaid1"
-  },
+  "contributors": [
+    {
+      "name": "Snaid1",
+      "username": "Snaid.9714",
+      "url": "https://github.com/Snaid1"
+    }
+  ],
   "directories": [ "notes" ],
   "enabled_without_gw2": false
 }

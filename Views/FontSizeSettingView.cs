@@ -13,7 +13,7 @@ namespace Snaid1.Blishpad.Views
     class FontSizeSettingView : View
     {
         private SettingEntry<string> settingEntry;
-        public static String[] _fontSizes = new string[] { "12", "14", "16", "18", "32" };
+        public static String[] _fontSizes = new string[] { "8", "11", "12", "14", "16", "18", "20", "22", "24", "32", "34", "36" };
         private int textwidth;
 
         public FontSizeSettingView(SettingEntry<string> se, int width = 100)

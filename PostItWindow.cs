@@ -65,8 +65,9 @@ namespace Snaid1.Blishpad
 
             escKey.Activated += delegate
             {
-                NotesModule._settingShowPostItWindow.Value = false;
                 _postItWindow.Hide();
+                escKey.Enabled = false;
+                NotesModule._settingShowPostItWindow.Value = false;
             };
         }
 
@@ -252,8 +253,12 @@ namespace Snaid1.Blishpad
         }
         public void ToggleWindow()
         {
-            NotesModule._settingShowPostItWindow.Value = (NotesModule._settingShowPostItWindow.Value == false);
             _postItWindow.ToggleWindow();
+            if(_postItWindow.Visible == false)
+            {
+                escKey.Enabled = false;
+            }
+            NotesModule._settingShowPostItWindow.Value = (NotesModule._settingShowPostItWindow.Value == false);
         }
 
         public void SetPostItHotkey()

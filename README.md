@@ -9,7 +9,7 @@ All releases can be downloaded through the BlishHUD UI in the module repo tab.
   - right clicking the icon will now toggle the post-it
   - the "Clicking icon toggles Post-It" setting now also causes right clicking the icon to toggle the Blishpad window 
 - added a wider variety of font sizes
-- added setting to disable copy cat code notifications
+- added setting to disable copy chat code notifications
 - added better error handling if notes become inaccessible
 #### v1.1.0
 - Double Clicking a chat code/chat link will copy it to the clipboard

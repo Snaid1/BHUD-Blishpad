@@ -32,30 +32,50 @@ namespace Snaid1.Blishpad.Utility
 
         public static BitmapFont getFont(string size)
         {
-            BitmapFont font;
-
+            ContentService.FontSize fontSize;
             switch (size)
             {
+                case "8":
+                    fontSize = ContentService.FontSize.Size8;
+                    break;
+                case "11":
+                    fontSize = ContentService.FontSize.Size11;
+                    break;
                 case "12":
-                    font = GameService.Content.DefaultFont12;
+                    fontSize = ContentService.FontSize.Size12;
                     break;
                 case "14":
-                    font = GameService.Content.DefaultFont14;
+                    fontSize = ContentService.FontSize.Size14;
                     break;
                 case "16":
-                    font = GameService.Content.DefaultFont16;
+                    fontSize = ContentService.FontSize.Size16;
                     break;
                 case "18":
-                    font = GameService.Content.DefaultFont18;
+                    fontSize = ContentService.FontSize.Size18;
+                    break;
+                case "20":
+                    fontSize = ContentService.FontSize.Size20;
+                    break;
+                case "22":
+                    fontSize = ContentService.FontSize.Size22;
+                    break;
+                case "24":
+                    fontSize = ContentService.FontSize.Size24;
                     break;
                 case "32":
-                    font = GameService.Content.DefaultFont32;
+                    fontSize = ContentService.FontSize.Size32;
+                    break;
+                case "34":
+                    fontSize = ContentService.FontSize.Size34;
+                    break;
+                case "36":
+                    fontSize = ContentService.FontSize.Size36;
                     break;
                 default:
-                    font = GameService.Content.DefaultFont16;
+                    fontSize = ContentService.FontSize.Size16;
                     break;
             }
-            return font;
+            return GameService.Content.GetFont(ContentService.FontFace.Menomonia, fontSize, ContentService.FontStyle.Regular);
         }
 
 

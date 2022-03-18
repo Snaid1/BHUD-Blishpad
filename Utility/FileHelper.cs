@@ -35,7 +35,13 @@ namespace Snaid1.Blishpad.Utility
         public static void WriteFile(string filename, string contents)
         {
             filename = SanitizeFileName(filename);
-            File.WriteAllText(BuildTxtPath(filename), contents);
+            try
+            {
+                File.WriteAllText(BuildTxtPath(filename), contents);
+            } catch (UnauthorizedAccessException e)
+            {
+                Blish_HUD.Debug.Contingency.NotifyFileSaveAccessDenied(BuildTxtPath(filename), string.Empty);
+            }
         }
 
         public static string ReadFile(string filename)
@@ -45,7 +51,14 @@ namespace Snaid1.Blishpad.Utility
             string fileLoc = BuildTxtPath(filename);
             if (File.Exists(fileLoc))
             {
-                fileContents = File.ReadAllText(fileLoc);
+                try
+                {
+                    fileContents = File.ReadAllText(fileLoc);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Blish_HUD.Debug.Contingency.NotifyFileSaveAccessDenied(BuildTxtPath(filename), string.Empty);
+                }
             }
             return fileContents;
         }
@@ -55,7 +68,14 @@ namespace Snaid1.Blishpad.Utility
             string fileLoc = BuildTxtPath(filename);
             if (File.Exists(fileLoc))
             {
-                File.Delete(fileLoc);
+                try
+                {
+                    File.Delete(fileLoc);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Blish_HUD.Debug.Contingency.NotifyFileSaveAccessDenied(BuildTxtPath(filename), string.Empty);
+                }
             }
         }
         public static string RenameFile(string oldFileName, string newFileName)

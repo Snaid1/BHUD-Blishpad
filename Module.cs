@@ -39,8 +39,9 @@ namespace Snaid1.Blishpad
         private static PostItWindow PostIt = new PostItWindow();
         public static NotesWindowController _notesManager;
         public PostItWindow postItWindow { get{ return PostIt; } }
-        //Settings
+        // General Settings
         public static SettingEntry<bool> _settingIconTogglesPostIt;
+        public static SettingEntry<bool> _settingShowNotificationOnCopy;
 
         // Post-It Settings
         public static SettingEntry<bool> _settingShowPostItWindow;
@@ -65,6 +66,7 @@ namespace Snaid1.Blishpad
             _notesManager.DefineSettings(settings);
 
             _settingIconTogglesPostIt = settings.DefineSetting("IconTogglesPostIt", false, () => "Icon Toggles Post-It", () => "If enabled, causes the icon to toggle the Post-It instead of opening the Blishpad Window.");
+            _settingShowNotificationOnCopy = settings.DefineSetting("ShowNotificationOnCopy", true, () => "Chat Link Copy Notifications", () => "Shows a notification when chat links are copied in Blishpad if enabled");
         }
 
         protected override void Initialize()

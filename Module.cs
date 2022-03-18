@@ -65,7 +65,7 @@ namespace Snaid1.Blishpad
             PostIt.DefineSettings(settings);
             _notesManager.DefineSettings(settings);
 
-            _settingIconTogglesPostIt = settings.DefineSetting("IconTogglesPostIt", false, () => "Icon Toggles Post-It", () => "If enabled, causes the icon to toggle the Post-It instead of opening the Blishpad Window.");
+            _settingIconTogglesPostIt = settings.DefineSetting("IconTogglesPostIt", false, () => "Left Click Icon Toggles Post-It", () => "When enabled, Left click toggles Post-It and right click toggles Blishpad window");
             _settingShowNotificationOnCopy = settings.DefineSetting("ShowNotificationOnCopy", true, () => "Chat Link Copy Notifications", () => "Shows a notification when chat links are copied in Blishpad if enabled");
         }
 
@@ -91,18 +91,36 @@ namespace Snaid1.Blishpad
 
             _notesIcon = CreateBlishpadIcon();
 
-            _notesIcon.Click += delegate {
-                if (_settingIconTogglesPostIt.Value)
-                {
-                    PostIt.ToggleWindow();
-                } else
-                {
-                    _notesManager.ToggleWindow();
-                }
-            };
+            _notesIcon.Click += handleBlishpadIconClick;
+            _notesIcon.RightMouseButtonPressed += handleBlishPadIconRightClick;
 
             // Base handler must be called
             base.OnModuleLoaded(e);
+        }
+
+        private void handleBlishPadIconRightClick(object sender, MouseEventArgs e)
+        {
+
+            if (_settingIconTogglesPostIt.Value)
+            {
+                _notesManager.ToggleWindow(); 
+            }
+            else
+            {
+                PostIt.ToggleWindow();
+            }
+        }
+
+        private void handleBlishpadIconClick(object sender, MouseEventArgs e)
+        {
+            if (_settingIconTogglesPostIt.Value)
+            {
+                PostIt.ToggleWindow();
+            }
+            else
+            {
+                _notesManager.ToggleWindow();
+            }
         }
 
         private CornerIcon CreateBlishpadIcon()

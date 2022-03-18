@@ -35,7 +35,7 @@ namespace Snaid1.Blishpad
         [ImportingConstructor]
         public NotesModule([Import("ModuleParameters")] ModuleParameters moduleParameters) : base(moduleParameters) { ModuleInstance = this; _notesManager = new NotesWindowController(ContentsManager); }
 
-
+        
         private static PostItWindow PostIt = new PostItWindow();
         public static NotesWindowController _notesManager;
         public PostItWindow postItWindow { get{ return PostIt; } }

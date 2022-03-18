@@ -22,6 +22,16 @@ namespace Snaid1.Blishpad.Views
                 Parent = buildPanel
             };
             settingShouldShowNotesView_Container.Show(settingShouldShowNotesView_View);
+
+            IView settingShowNotificationOnCopy_View = SettingView.FromType(NotesModule._settingShowNotificationOnCopy, buildPanel.Width);
+            ViewContainer settingShowNotificationOnCopy_Container = new ViewContainer()
+            {
+                WidthSizingMode = SizingMode.Fill,
+                Location = new Point(10, settingShouldShowNotesView_Container.Bottom + 10),
+                Parent = buildPanel
+            };
+            settingShowNotificationOnCopy_Container.Show(settingShowNotificationOnCopy_View);
+
         }
         public Panel BuildGeneralSettingsPanel()
         {

@@ -99,21 +99,33 @@ namespace Snaid1.Blishpad.Controls
 
         protected int GetStartOfChatCode(int index)
         {
-            while(index > 0 && (index - 1 >= _text.Length || !WordSeperators.Contains(_text[index - 1]) || ChatCodeStartSymbols.Contains(_text[index-1])) && _text[index] != '[')
+            if(index > 0 && index < _text.Length)
             {
-                index --;
+                while (index > 0 && (index - 1 >= _text.Length || !WordSeperators.Contains(_text[index - 1]) || ChatCodeStartSymbols.Contains(_text[index - 1])) && _text[index] != '[')
+                {
+                    index--;
+                }
+                if (_text[index] != '[' || _text[index + 1] != '&') { index = -1; }
+            } else
+            {
+                index = -1;
             }
-            if(_text[index] != '[' || _text[index + 1] != '&') { index = -1; }
             return index;
         }
 
         protected int GetEndOfChatCode(int index)
         {
-            while (index < _text.Length && (!WordSeperators.Contains(_text[index]) || ChatCodeEndSymbols.Contains(_text[index])) && _text[index - 1] != ']')
+            if(index > 0 && index < _text.Length)
             {
-                index++;
+                while (index < _text.Length && (!WordSeperators.Contains(_text[index]) || ChatCodeEndSymbols.Contains(_text[index])) && _text[index - 1] != ']')
+                {
+                    index++;
+                }
+                if (_text[index-1] != ']') { index = -1; }
+            } else
+            {
+                index = -1;
             }
-            if (_text[index-1] != ']') { index = -1; }
             return index;
         }
 

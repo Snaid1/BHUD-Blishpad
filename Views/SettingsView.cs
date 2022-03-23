@@ -18,10 +18,10 @@ namespace Snaid1.Blishpad.Views
 
             Panel parentPanel = new FlowPanel()
             {
-                CanScroll = false,
+                CanScroll = true,
                 Parent = buildPanel,
                 Height = buildPanel.Height,
-                Width = buildPanel.Width - 20,
+                Width = buildPanel.Width - 60,
                 FlowDirection = ControlFlowDirection.SingleTopToBottom
             };
 

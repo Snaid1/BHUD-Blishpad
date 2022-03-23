@@ -39,7 +39,9 @@ namespace Snaid1.Blishpad.Views
             {
                 CanScroll = false,
                 HeightSizingMode = SizingMode.AutoSize,
-                Title = "General Settings"
+                Title = "General Settings",
+                CanCollapse = true,
+                Collapsed = false
             };
 
             Build(generalPanel);

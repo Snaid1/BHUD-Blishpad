@@ -45,7 +45,9 @@ namespace Snaid1.Blishpad.Views
             {
                 CanScroll = false,
                 HeightSizingMode = SizingMode.AutoSize,
-                Title = "Notes Manager Settings"
+                Title = "Notes Manager Settings",
+                CanCollapse = true,
+                Collapsed = false
             };
 
             Build(NotesSettingPanel);

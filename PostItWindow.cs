@@ -203,8 +203,8 @@ namespace Snaid1.Blishpad
                 Font = BlishpadUtility.getFont(NotesModule._settingPostItFontSize.Value),
                 Location = new Point(0, 0),
                 Text = PostItText
-
             };
+            _postItTextBox.TextChanged += delegate { PostItText = _postItTextBox.Text; };
 
             _postItWindow.MouseEntered += delegate { mouseOn = true; assignPostItOpacity(mouseOn, _postItTextBox.Focused); };
             _postItWindow.MouseLeft += delegate {
@@ -249,6 +249,7 @@ namespace Snaid1.Blishpad
         public void Show()
         {
             NotesModule._settingShowPostItWindow.Value = true;
+            _postItTextBox.Text = PostItText;
             _postItWindow.Show();
         }
         public void ToggleWindow()
@@ -256,6 +257,11 @@ namespace Snaid1.Blishpad
             _postItWindow.ToggleWindow();
             if(_postItWindow.Visible == false)
             {
+                PostItText = _postItTextBox.Text;
+                if (NotesModule._settingPreservePostItContents.Value)
+                {
+                    _postItTextBox.Save();
+                }
                 escKey.Enabled = false;
             }
             NotesModule._settingShowPostItWindow.Value = (NotesModule._settingShowPostItWindow.Value == false);

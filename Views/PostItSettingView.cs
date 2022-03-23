@@ -113,7 +113,9 @@ namespace Snaid1.Blishpad.Views
             {
                 CanScroll = false,
                 HeightSizingMode = SizingMode.AutoSize,
-                Title = "Post-It Settings"
+                Title = "Post-It Settings",
+                CanCollapse = true,
+                Collapsed = false
             };
             
             Build(postItPanel);

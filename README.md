@@ -4,6 +4,11 @@ A module for taking and keeping notes you want to quickly reference in BlishHUD.
 All releases can be downloaded through the BlishHUD UI in the module repo tab.
 
 ### Change Log
+#### v1.1.3
+- Fixed a bug where the post-it would lose contents between toggles in some situations
+- fixed some minor graphical issues/inconsistencies with the settings page.
+#### v1.1.2
+- Fixed a bug with clicking to copy chat code when clicking on empty space or there is no chat code.
 #### v1.1.1
 - added right click behavior to the icon
   - right clicking the icon will now toggle the post-it
